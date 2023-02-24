@@ -23,7 +23,7 @@ int pointSet = 0;  // used to determine the turnTo position
 void setup() {
   Serial.begin(9600);
   lastRead = 0;
-
+  turnTo=90;
   pinMode(motorPin1, OUTPUT); // set motor pins for output
   pinMode(motorPin2, OUTPUT);
 
@@ -31,6 +31,18 @@ void setup() {
 }
 
 void loop() {
+      if (degreesRead <= turnTo - tolerance) {
+        digitalWrite(7, LOW); // set direction forward
+        analogWrite(9, dutyCycle * 255 / 100); // run motor
+
+      } else if ((degreesRead >= (turnTo - tolerance)) && (degreesRead <= turnTo + tolerance)) {
+        analogWrite(9, 0); // stop motor
+
+      } else if (degreesRead >= turnTo + tolerance) {
+        digitalWrite(7, HIGH); // set direction forward
+        analogWrite(9, dutyCycle * 255 / 100); // run motor
+      }
+  
   float encoderRead = myEnc.read();
 
   if (Serial.available() > 0){
@@ -112,8 +124,10 @@ void loop() {
   }
 
   //position_bytes[0] = degreesRead & 0xFF;
-  //position_bytes[1] = (degreesRead >> 8) & 0xFF;
-  Serial.write(degreesRead); // send current position back to raspberry Pi
+  //position_bytes[1] = (degreesRead >> 8) & 0xFF
+//  char buffer [8];
+//  dtostrf(degreesRead, 4, 4, buffer);
+  Serial.write(int(degreesRead)); // send current position back to raspberry Pi
 
   delay(1);
 }
