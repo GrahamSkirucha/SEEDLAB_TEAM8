@@ -33,8 +33,8 @@ int pointSet = 0;  // used to determine the turnTo position
 // }
 
 void setup() {
-  Wire.begin(1);
-  Serial.begin(9600)
+  Wire.begin(0x04);
+  Serial.begin(9600);
   lastRead = 0;
   turnTo = 0;
 
