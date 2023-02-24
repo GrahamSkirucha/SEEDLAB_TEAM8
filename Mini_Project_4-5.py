@@ -10,9 +10,12 @@ import board
 import serial
 import cv2
 import numpy as np
+import smbus
 
-ser = serial.Serial('/dev/ttyACM0', 250000)
 
+ser = serial.Serial('/dev/ttyACM0', 115200)
+#i2c = board.I2C()
+#bus = smbus.SMBus(1)
 #Setpoint Library Key
 #Top "0" = 0
 #Right "1" = np.pi/2
@@ -24,9 +27,16 @@ current_position = 0
 aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
 aruco_params = cv2.aruco.DetectorParameters_create()
 
-
+#def ReadfromArduino():
+#    while (ser.in_waiting > 0):
+#        try:
+#            line = ser.readline()
+#            print("serial output : ", line)
+#        except:
+#            print("Communication Error")
 #I2C Setup for Pi to display info on LCD
 i2c = busio.I2C(board.SCL, board.SDA)
+
 lcd_columns = 16
 lcd_rows = 2
 lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
@@ -64,11 +74,12 @@ while True:
 #        else:
 #            point_set = 3
 
-        ser.write(b'p')
+        #ser.write(b'p')
         print('send setpoint')
-        point_set_byte = point_set.to_bytes(1, byteorder = 'little')
+        #bus.write_byte(0x04, point_set)
+        point_set = str(point_set)
         print('Writing')
-        ser.write(point_set_byte)
+        ser.write(point_set.encode())
         print('sent')
     #wait before requesting position again
         time.sleep(.1)
@@ -79,9 +90,11 @@ while True:
 #            time.sleep(.01)
 #            print('waiting')
         print('recieved')
-        position_bytes = ser.read(2)
-        current_position = int.from_bytes(position_bytes, byteorder = 'little')
-        print(current_position)
+        current_position = ser.readline().decode().rstrip()
+        #current_position = int(current_position)
+        #position_bytes = bus.read_byte(0x04)
+        #current_position = int.from_bytes(position_bytes, byteorder = 'little')
+        print('position: ',current_position)
         print(point_set)
         #current_position = 0  
 #        positionString = ''
