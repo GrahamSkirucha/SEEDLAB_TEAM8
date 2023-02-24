@@ -63,6 +63,8 @@ while True:
 #            point_set = 2
 #        else:
 #            point_set = 3
+
+        ser.write(b'p')
         print('send setpoint')
         point_set_byte = point_set.to_bytes(1, byteorder = 'little')
         print('Writing')
@@ -71,7 +73,7 @@ while True:
     #wait before requesting position again
         time.sleep(.1)
     
-        ser.write(b'p')
+        
         
 #        while ser.in_waiting < 2:
 #            time.sleep(.01)
@@ -79,6 +81,8 @@ while True:
         print('recieved')
         position_bytes = ser.read(2)
         current_position = int.from_bytes(position_bytes, byteorder = 'little')
+        print(current_position)
+        print(point_set)
         #current_position = 0  
 #        positionString = ''
 #        if current_position == 0:
@@ -95,7 +99,9 @@ while True:
 #            positionString = '3π/2' 
         print('LCD')
         lcd.clear()
+        print('message')
         lcd.message = 'Setpoint: {}\nPosition: {}'.format(point_set, current_position)
+        print('printed')
     lcd.clear()
     #lcd.message = 'Completed'
     frame = cv2.aruco.drawDetectedMarkers(frame, corners, ids)
