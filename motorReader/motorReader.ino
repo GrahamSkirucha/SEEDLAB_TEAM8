@@ -1,6 +1,6 @@
 //copied from one of the example codes in the zip file
 #include <Encoder.h>
-//make sure the encoder is connected to 5 and 6
+//make sure the encoder is connected to 2 and 3
 #define ENCODER_USE_INTERRUPTS
 Encoder myEnc(2,3);
 int lastRead;
