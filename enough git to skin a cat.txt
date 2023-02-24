@@ -1,0 +1,24 @@
+git status //shows what you haven't committed or pushed
+git log //shows the commit history
+git add <filename> <filename> // adds all the files you have in that list
+git add . //adds everything
+git commit -m "Name of the commit here - author (I like this format but you guys do not have to use it)" //makes a commit on your local machine
+git push origin main //pushes all of the commits on your machine up to the internet
+git pull origin main //pulls all of the changes people pushed on the internet ** this will change your files so make sure you are on the correct commit with no changes - you may want to move your changes elsewhere or **
+git checkout <first 4 digits or so of the commit id> //goes back in time to the commit you want to check out - if you use git push from here it will stack on top of other commits
+
+
+how to get git on your computer or the pi
+git --version //shows the version of git on your computer - tells you if your have git - if you do not you will need to install it with the command below
+sudo apt install git //installs git with the command line if you do not have git on your computer - you don't have to do this if you already have git
+
+how to get our repository on your computer or pi
+ssh-keygen //generates an rsa key that you put on github to identify yourself to the repo when you clone - hit enter through the other steps it will generate a file for your key pair and passphrase is optional
+//between this code and the clone command below you need to copy the id_rsa.pub text and paste it on your github page - when github sees this key it knows that you are the owner of the ssh key and that you are supposed to have access to the repo
+//also pick a folder to be in with the terminal before you clone
+git clone git@github.com:GrahamSkirucha/SEEDLAB_TEAM8.git //clones the repository onto your computer
+
+optional git abilities I know off the top of my head
+git branch <branch name> //makes a branch which separates you from the rest of the group and makes sure you are not experimenting with live code
+git checkout <branch name> //takes you to the branch you made
+git merge <branch name> <different branch name> //merge two branches and pray that they don't 
