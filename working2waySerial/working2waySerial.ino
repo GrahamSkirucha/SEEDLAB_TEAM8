@@ -40,7 +40,7 @@ void loop() {
   //tStart = micros(); 
   // recieve position
   if (DataRead) {
-    pointSet = data.toInt();
+    pointSet = data.toInt(); //unitless
     DataRead = false;
   }
 
@@ -55,8 +55,8 @@ void loop() {
   }
   
   // move motor
-  desiredAngle = 90*pointSet;
-  vOut = Kp * (desiredAngle - degreesRead);
+  desiredAngle = 90*pointSet; //degrees
+  vOut = Kp * (desiredAngle - degreesRead); //volts
 
   // set direction
   if (vOut <= 0) {
