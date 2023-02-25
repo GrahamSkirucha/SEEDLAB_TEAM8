@@ -13,7 +13,7 @@ import numpy as np
 import smbus
 
 
-ser = serial.Serial('/dev/ttyACM0', 115200)
+ser = serial.Serial('/dev/ttyACM0', 38400, timeout = .001)
 #i2c = board.I2C()
 #bus = smbus.SMBus(1)
 #Setpoint Library Key
@@ -41,17 +41,23 @@ lcd_columns = 16
 lcd_rows = 2
 lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
 cap = cv2.VideoCapture(0);
-
+counter = 0
 while True:
     ret, frame = cap.read()
     
     corners, ids, _= cv2.aruco.detectMarkers(frame, aruco_dict, parameters = aruco_params)
     
+    while ser.in_waiting:
+        current_position = ser.readline()
+        
+        print('position: ',current_position)
+        print(point_set)
+    
     if ids is not None:
         marker_id = ids[0][0]
         marker_corners = corners[0][0]
         marker_x, marker_y = np.mean(marker_corners, axis = 0)
-        
+        frame = cv2.aruco.drawDetectedMarkers(frame, corners, ids)
         if marker_x <frame.shape[1]/3:
             point_set = 1
         elif marker_x < 2*frame.shape[1]/3:
@@ -61,25 +67,15 @@ while True:
                 point_set = 2
         else:
             point_set = 3
-        
-        #Need to calculate based off motor control code and CV
-#        current_position = 0
-#    
-#        if current_position < 250:
-#            point_set = 0
-#        elif current_position < 500:
-#            point_set = 1
-#        elif current_position < 750:
-#            point_set = 2
-#        else:
-#            point_set = 3
+    
 
         #ser.write(b'p')
         print('send setpoint')
         #bus.write_byte(0x04, point_set)
-        point_set = str(point_set)
+        point_set = str(point_set) + '\n'
         print('Writing')
         ser.write(point_set.encode())
+        counter += 1
         print('sent')
     #wait before requesting position again
         time.sleep(.1)
@@ -90,34 +86,18 @@ while True:
 #            time.sleep(.01)
 #            print('waiting')
         print('recieved')
-        current_position = ser.readline().decode().rstrip()
-        #current_position = int(current_position)
-        #position_bytes = bus.read_byte(0x04)
-        #current_position = int.from_bytes(position_bytes, byteorder = 'little')
-        print('position: ',current_position)
-        print(point_set)
-        #current_position = 0  
-#        positionString = ''
-#        if current_position == 0:
-#            current_position = 0
-#            positionString = '0π '
-#        elif current_position == 1:
-#            current_position = 90
-#            positionString = 'π/2' 
-#        elif current_position == 2:
-#            current_position = 180
-#            positionString = 'π' 
-#        else:
-#            current_position = 270
-#            positionString = '3π/2' 
-        print('LCD')
-        lcd.clear()
-        print('message')
-        lcd.message = 'Setpoint: {}\nPosition: {}'.format(point_set, current_position)
-        print('printed')
-    lcd.clear()
+        
+        #print('LCD')
+        #
+        if counter == 7:
+            lcd.clear()
+        #print('message')
+            counter = 0
+            lcd.message = 'Setpoint: {}\nPosition: {}'.format(point_set, current_position)
+        #print('printed')
+    #lcd.clear()
     #lcd.message = 'Completed'
-    frame = cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+    
     cv2.imshow("frame", frame)
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -126,55 +106,5 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 ser.close()
-
-#point_set = 0
-#current_position = 0
-#
-#
-#
-#
-##I2C Setup for Pi to display info on LCD
-#i2c = busio.I2C(board.SCL, board.SDA)
-#lcd_columns = 16
-#lcd_rows = 2
-#lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
-
-#Find values to setpoint and set them for arduino translation
-#while True:
-#    #Need to calculate based off motor control code and CV
-#    current_position = 0
-#    
-#    if current_position < 250:
-#        point_set = 0
-#    elif current_position < 500:
-#        point_set = 1
-#    elif current_position < 750:
-#        point_set = 2
-#    else:
-#        point_set = 3
-#        
-#    point_set_byte = point_set.to_bytes(1, byteorder = 'little')
-#    ser.write(point_set_byte)
-#    
-#    #wait before requesting position again
-#    time.sleep(.1)
-#    
-#    ser.write(b'p')
-#    
-#    while ser.in_waiting < 2:
-#        time.sleep(.01)
-#        
-#    position_bytes = ser.read(2)
-#    current_position = int.from_bytes(position_bytes, byteorder = 'little')
-#    
-#    lcd.clear()
-#    lcd.message = 'Setpoint: {}\nPosition: {}'.format(point_set, current_position)
-    
-    
-#ser.close()
-
-
-
-
 
 _________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________

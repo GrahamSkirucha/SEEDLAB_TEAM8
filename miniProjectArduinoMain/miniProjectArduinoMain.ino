@@ -2,7 +2,7 @@
 //Section 4.5 Codefor Arduino
 
 //Jaron
-//make sure the encoder is connected to 5 and 6
+//make sure the encoder is connected to 5 and 6   
 
 #include <Encoder.h>
 #define ENCODER_USE_INTERRUPTS
