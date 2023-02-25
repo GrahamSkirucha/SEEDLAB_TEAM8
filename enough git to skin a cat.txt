@@ -1,12 +1,11 @@
+git pull origin main //pulls all of the changes people pushed on the internet ** this will change your files so make sure you are on the correct commit with no changes - you may want to move your changes elsewhere or **
 git status //shows what you haven't committed or pushed
 git log //shows the commit history
 git add <filename> <filename> // adds all the files you have in that list
 git add . //adds everything
 git commit -m "Name of the commit here - author (I like this format but you guys do not have to use it)" //makes a commit on your local machine
 git push origin main //pushes all of the commits on your machine up to the internet
-git pull origin main //pulls all of the changes people pushed on the internet ** this will change your files so make sure you are on the correct commit with no changes - you may want to move your changes elsewhere or **
 git checkout <first 4 digits or so of the commit id> //goes back in time to the commit you want to check out - if you use git push from here it will stack on top of other commits
-
 
 how to get git on your computer or the pi
 git --version //shows the version of git on your computer - tells you if your have git - if you do not you will need to install it with the command below
