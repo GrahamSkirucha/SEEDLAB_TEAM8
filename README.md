@@ -7,3 +7,4 @@ Our repository will have one folder for every assignment that contains all of th
   and deliverables in one folder, as well as rough drafts and intermediate versions of code in another folder.
 In addition to each folder, we will have this README.md file as well as a text file called 'enough git to skin a cat.txt'. This text file describes basic git operations
   and how to execute them on a command line.
+Our team will use the document 'Progress.md' to catalog tasks as 'to be done', 'in progress', and 'done', and this file will also exist outside the project folders.
