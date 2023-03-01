@@ -20,12 +20,15 @@ double prev1Time = 0.0;
 double prev2Time = 0.0;
 double wheelRadius = 0.05;
 double betweenWheels = 0.1;
+//necessary only if we want to control position
 double xpos = 0.0;
 double ypos = 0.0;
 double phi = 0.0;
+//interrupt flag
 int isrEntered = 0;
-#define ROTATIONCOUNTS 80
-#define DEBOUNCE 10
+#define ROTATIONCOUNTS 3000
+#define WHEELRADIUS 0.05
+#define BETWEENWHEELS 0.1
 
 //isr measures the state of the pins and adjusts the counts and isr flag - only entered once pinA changes
 void encoder1(){
@@ -33,7 +36,7 @@ void encoder1(){
   int e1stateA = digitalRead(e1pinA);
   int e1stateB = digitalRead(e1pinB);
   //determine clockwise or counter-clockwise
-  timeKept = micros();
+  timeKept = millis() / 1000.0;
   double duration = timeKept - prev1Time;
   //makes sure that there are no infinite velocities
   if(duration == 0.0) return;
@@ -56,7 +59,7 @@ void encoder2(){
   int e2stateA = digitalRead(e2pinA);
   int e2stateB = digitalRead(e2pinB);
   //record time in seconds
-  timeKept = micros();
+  timeKept = millis / 1000.0;
   double duration = timeKept - prev2Time;
   //make sure there are no infinite velocities that result in nan
   if(duration == 0.0) return;
