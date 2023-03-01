@@ -3,8 +3,10 @@ Author: Jaron O'Grady
 This code records velocity and time.
 */
 //global variables include encoder pins, the states of the encoder pins, the net count of clockwise increments
+//copied from one of the example codes in the zip file
+//make sure the encoder is connected to 2 and 3
 int e1pinA = 2; //clk encoder 1
-int e1pinB = 4; //dt encoder 1
+int e1pinB = 4 //dt encoder 1
 int e2pinA = 3; //clk encoder 2
 int e2pinB = 5; //dt encoder 2
 int e1stateA = 0;
@@ -31,7 +33,7 @@ void encoder1(){
   int e1stateA = digitalRead(e1pinA);
   int e1stateB = digitalRead(e1pinB);
   //determine clockwise or counter-clockwise
-  timeKept = millis() / 1000.0;
+  timeKept = micros();
   double duration = timeKept - prev1Time;
   //makes sure that there are no infinite velocities
   if(duration == 0.0) return;
@@ -54,7 +56,7 @@ void encoder2(){
   int e2stateA = digitalRead(e2pinA);
   int e2stateB = digitalRead(e2pinB);
   //record time in seconds
-  timeKept = millis() / 1000.0;
+  timeKept = micros();
   double duration = timeKept - prev2Time;
   //make sure there are no infinite velocities that result in nan
   if(duration == 0.0) return;
@@ -101,5 +103,3 @@ void loop() {
     isrEntered = 0;
   }
 }
-
-
