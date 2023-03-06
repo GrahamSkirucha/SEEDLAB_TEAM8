@@ -11,7 +11,7 @@
 #define lKi 0
 #define rKi 0
 
-#define decelRate 10
+#define decelRate 10  // units?
 #define startSpeed 10
 #define accelRate 10
 
@@ -40,7 +40,7 @@ float flatDist = 0; // cm
 float decelDist; //cm
 float accelDist; //cm
 float desiredDistance = 10; //cm
-float desiredSpeed;
+float desiredSpeed; // determined by trapezoid motion profile
 
 float xPos; // temp
 float leftSpeed; // temp
@@ -65,8 +65,9 @@ void loop() {
   accelDist = (maxSpeed - startSpeed) / accelRate;
   decelDist = maxSpeed / decelRate;
 
+  //// Determine distances of acceleration, deceleration, and flat distance
   if (accelDist + decelDist < desiredDistance) {
-    flatDist = desiredDistance - accelDist - decelDist;
+    flatDist = desiredDistance - accelDist - decelDist; 
   } else {
     // Redefine trapezoid
     maxSpeed = desiredDistance / (1 / accelRate + 1 / decelRate); // Max speed that will be reached in the trapezoid
@@ -96,6 +97,7 @@ void loop() {
   curTime = millis();
   dt = (curTime - prevTime) / 1000;
 
+  //// PID stuff
   leftError = desiredSpeed - leftSpeed;
   rightError = desiredSpeed - rightSpeed;
 
