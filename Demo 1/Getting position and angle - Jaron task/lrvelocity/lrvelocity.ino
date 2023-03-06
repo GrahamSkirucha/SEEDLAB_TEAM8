@@ -6,9 +6,9 @@ This code records velocity and time.
 //copied from one of the example codes in the zip file
 //make sure the encoder is connected to 2 and 3
 int e1pinA = 2; //clk encoder 1
-int e1pinB = 4 //dt encoder 1
+int e1pinB = 5; //dt encoder 1
 int e2pinA = 3; //clk encoder 2
-int e2pinB = 5; //dt encoder 2
+int e2pinB = 6; //dt encoder 2
 int e1stateA = 0;
 int e1stateB = 0;
 int e2stateA = 0;
@@ -59,7 +59,7 @@ void encoder2(){
   int e2stateA = digitalRead(e2pinA);
   int e2stateB = digitalRead(e2pinB);
   //record time in seconds
-  timeKept = millis / 1000.0;
+  timeKept = (millis()) / 1000.0;
   double duration = timeKept - prev2Time;
   //make sure there are no infinite velocities that result in nan
   if(duration == 0.0) return;
@@ -85,11 +85,18 @@ void setup() {
   pinMode(e2pinB, INPUT_PULLUP);
   attachInterrupt(0, encoder1, CHANGE);
   attachInterrupt(1, encoder2, CHANGE);
-  Serial.begin(9600);
+  Serial.begin(38400);
 }
 
 //prints the net counts given there has been a change in pinA
 void loop() {
+  timeKept = millis() / 1000.0;
+  if ((timeKept - prev1Time) > .2){
+    velocity1 = 0.0;  
+  } 
+  if ((timeKept - prev2Time) > .2){
+    velocity1 = 0.0;
+  }
   //sei(); - uncomment if revisiting to see if this fixes the problem of not always seeing rotations/bouncing
   if(isrEntered){
     //sei(); - uncomment if revisiting to see if this fixes the problem of not always seeing rotations/bouncing

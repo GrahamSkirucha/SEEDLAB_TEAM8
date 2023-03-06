@@ -19,12 +19,6 @@ int pointSet;  // used to determine the turnTo position
 int tStart;
 int tEnd;
 float Kp;
-float Ki;
-float dt = 0.033;
-float integral;
-
-int error;
-int lastError;
 float vOut;
 int PWMout;
 bool moveDir;
@@ -36,9 +30,6 @@ void setup() {
   pointSet = 0;
   degreesRead = 0;
   Kp = 0.1;
-  Ki = 0.2;
-  lastError = 0;
-  
   pinMode(motorPin1, OUTPUT); // set motor pins for output
   pinMode(motorPin2, OUTPUT);
   digitalWrite(enablePin, HIGH); // set enable pin to high to enable motor driver
@@ -58,17 +49,14 @@ void loop() {
   // get current position
   if(encoderRead != lastRead) {
     //convert to degrees
-    degreesRead = encoderRead * 360 / 3200;
+    degreesRead = encoderRead *360 / 3200;
 
     lastRead = encoderRead;
   }
   
   // move motor
   desiredAngle = 90*pointSet; //degrees
-  error = desiredAngle - degreesRead;
-  integral = (error + lastError)/2*dt;
-  vOut = Kp * (error) + Ki * integral; //volts
-  lastError = error;
+  vOut = Kp * (desiredAngle - degreesRead); //volts
 
   // set direction
   if (vOut <= 0) {
@@ -94,7 +82,7 @@ void loop() {
   analogWrite(motorPin2, abs(PWMout));
   
   // send current position
-  //  sendPosition = String("Pwm: " + String(PWMout) + "degrees: " + String(degreesRead));
+ //  sendPosition = String("Pwm: " + String(PWMout) + "degrees: " + String(degreesRead));
   sendPosition = String(degreesRead);
 
   Serial.println(sendPosition);

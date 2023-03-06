@@ -22,6 +22,13 @@ double xpos = 0.0;
 double ypos = 0.0;
 double phi = 0.0;
 int isrEntered = 0;
+
+//here is motor control setup may not be needed
+const int motorPin1 = 7; //direction
+const int motorPin2 = 9;
+const int enablePin = 4;
+
+
 #define ROTATIONCOUNTS 80
 #define DEBOUNCE 10
 
@@ -95,7 +102,10 @@ void setup() {
   pinMode(e2pinB, INPUT_PULLUP);
   attachInterrupt(0, encoder1, CHANGE);
   attachInterrupt(1, encoder2, CHANGE);
-  Serial.begin(9600);
+  Serial.begin(38400);
+  pinMode(motorPin1, HIGH); // set motor pins for output
+  pinMode(motorPin2, HIGH);
+  digitalWrite(enablePin, HIGH);
 }
 
 //prints the net counts given there has been a change in pinA
@@ -116,5 +126,3 @@ void loop() {
     isrEntered = 0;
   }
 }
-
-
