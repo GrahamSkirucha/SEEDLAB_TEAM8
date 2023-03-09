@@ -76,7 +76,7 @@ double prev2Time = 0.0;
 #define BETWEENWHEELS 0.1524
 
 #define desiredMeters 0.305 * 5 //input meters
-float desiredDistance = 3200 * (1/(WHEELRADIUS*2*3.14159)) * desiredMeters * 0.18; //counts
+float desiredDistance = 3200 * (1/(WHEELRADIUS*2*PI)) * desiredMeters * 0.18; //counts
 
 
 //potential change on what is sent
@@ -165,8 +165,8 @@ void encoder2(){
 }
 
 int angleToCounts(float THETA) { // input theta in degrees
-  float arcLength = BETWEENWHEELS / 2 * THETA * 3.14159 / 180; //m
-  float dist = 3200 * (1/(WHEELRADIUS*2*3.14159)) * arcLength;
+  float arcLength = BETWEENWHEELS / 2 * THETA * PI / 180; //m
+  float dist = 3200 * (1/(WHEELRADIUS*2*PI)) * arcLength;
 
   return dist;
 }
@@ -198,7 +198,7 @@ void move(float DISTANCE, int LDIR, int RDIR) {
     
     //determine desired speed
     if (enc1Counts < accelDist) {
-      desiredSpeed = startSpeed + accelRate * xpos;
+      desiredSpeed = startSpeed + accelRate * enc1Counts;
       //Serial.println("accelerating");
     }
     // Flat segment
@@ -208,7 +208,7 @@ void move(float DISTANCE, int LDIR, int RDIR) {
     }
     // Deceleration segment
     else if (enc1Counts < flatDist + accelDist + decelDist) {
-      desiredSpeed = maxSpeed - (decelRate * (xpos - flatDist));
+      desiredSpeed = maxSpeed - (decelRate * (enc1Counts - flatDist));
       //Serial.println("decelerating");
     }
     // Too far
