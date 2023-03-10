@@ -16,8 +16,8 @@ double velocity2 = 0.0;
 double timeKept = 0.0;
 double prev1Time = 0.0;
 double prev2Time = 0.0;
-double wheelRadius = 0.05;
-double betweenWheels = 0.1;
+#define WHEELRADIUS 0.0762
+#define BETWEENWHEELS 0.1524
 double xpos = 0.0;
 double ypos = 0.0;
 double phi = 0.0;
@@ -29,8 +29,8 @@ const int motorPin2 = 9;
 const int enablePin = 4;
 
 
-#define ROTATIONCOUNTS 80
-#define DEBOUNCE 10
+#define ROTATIONCOUNTS 3000
+// #define DEBOUNCE 10
 
 //isr measures the state of the pins and adjusts the counts and isr flag - only entered once pinA changes
 void encoder1(){
@@ -43,7 +43,7 @@ void encoder1(){
   //makes sure that there are no infinite velocities
   if(duration == 0.0) return;
   //the value of pi in arduino is M_PI
-  double v = wheelRadius*2*2*PI/(ROTATIONCOUNTS * duration);
+  double v = WHEELRADIUS*2*2*PI/(ROTATIONCOUNTS * duration);
   if(e1stateA == e1stateB){
     velocity1 = v;
   }
@@ -53,7 +53,7 @@ void encoder1(){
   //update the position variables
   xpos = xpos + duration * cos(phi) * (velocity1 + velocity2) / 2;
   ypos = ypos + duration * sin(phi) * (velocity1 + velocity2) / 2;
-  phi = phi + duration * (velocity1 - velocity2) / betweenWheels;
+  phi = phi + duration * (velocity1 - velocity2) / BETWEENWHEELS;
   //makes sure that phi stays in the range of -2PI to 2PI
   if((phi > 2 * PI) || (phi < -2 * PI)){
     phi = 0;
@@ -73,7 +73,7 @@ void encoder2(){
   //make sure there are no infinite velocities that result in nan
   if(duration == 0.0) return;
   //the value of pi in arduino is M_PI
-  double v = wheelRadius*2*2*PI/(ROTATIONCOUNTS * duration);
+  double v = WHEELRADIUS*2*2*PI/(ROTATIONCOUNTS * duration);
   if(e2stateA == e2stateB){
     velocity2 = v;
   }
@@ -83,7 +83,7 @@ void encoder2(){
   //update the position variables
   xpos = xpos + duration * cos(phi) * (velocity1 + velocity2) / 2;
   ypos = ypos + duration * sin(phi) * (velocity1 + velocity2) / 2;
-  phi = phi + duration * (velocity1 - velocity2) / betweenWheels;
+  phi = phi + duration * (velocity1 - velocity2) / BETWEENWHEELS;
   //makes sure that phi stays in the range of -2PI to 2PI
   if((phi > 2 * PI) || (phi < -2 * PI)){
     phi = 0;
@@ -102,7 +102,7 @@ void setup() {
   pinMode(e2pinB, INPUT_PULLUP);
   attachInterrupt(0, encoder1, CHANGE);
   attachInterrupt(1, encoder2, CHANGE);
-  Serial.begin(38400);
+  Serial.begin(9600);
   pinMode(motorPin1, HIGH); // set motor pins for output
   pinMode(motorPin2, HIGH);
   digitalWrite(enablePin, HIGH);

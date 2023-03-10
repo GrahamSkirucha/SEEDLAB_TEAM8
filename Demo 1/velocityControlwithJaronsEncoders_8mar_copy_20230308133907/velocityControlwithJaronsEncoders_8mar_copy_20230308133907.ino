@@ -90,8 +90,7 @@ int enc2Counts = 0;
 
 
 
-#define ROTATIONCOUNTS 80
-#define DEBOUNCE 10
+#define ROTATIONCOUNTS 3000
 
 //isr measures the state of the pins and adjusts the counts and isr flag - only entered once pinA changes
 void encoder1(){
@@ -310,24 +309,24 @@ void loop() {
   if(isrEntered){
     //sei(); - uncomment if revisiting to see if this fixes the problem of not always seeing rotations/bouncing
     //link for how to print doubles and floating points: https://www.programmingelectronics.com/dtostrf/
-    //    char buffer[144];
-    //    char printxbuffer[8];
-    //    char printybuffer[8];
-    //    char printphibuffer[8];
-    //    dtostrf(xpos, 4, 4, printxbuffer);
-    //    dtostrf(ypos, 4, 4, printybuffer);    
-    //    dtostrf(phi, 4, 4, printphibuffer);
-    //    //sprintf(buffer, "X position: %s, Y Position: %s, Phi: %s", printxbuffer, printybuffer, printphibuffer);
-    //    //Serial.println(buffer);
-    //    isrEntered = 0;
-    // Serial.println("isr");
+    // char buffer[144];
+    // char printxbuffer[8];
+    // char printybuffer[8];
+    // char printphibuffer[8];
+    // dtostrf(xpos, 4, 4, printxbuffer);
+    // dtostrf(ypos, 4, 4, printybuffer);    
+    // dtostrf(phi, 4, 4, printphibuffer);
+    Serial.println(phi);
+    //sprintf(buffer, "X position: %s, Y Position: %s, Phi: %s", printxbuffer, printybuffer, printphibuffer);
+    //Serial.println(buffer);
     isrEntered = 0;
+    // Serial.println("isr");
   }
   
 
 
   // // serial
-  float angleRecieved = 90;
+  float angleRecieved = 60;
   int ldir = (angleRecieved >= 0) ? -1 : 1; 
   int rdir = -ldir;
   int turnCounts = angleToCounts(angleRecieved);
@@ -340,6 +339,6 @@ void loop() {
   //wait for button press
   while (digitalRead(pushButton) == 1); // wait for button push
   while (digitalRead(pushButton) == 0); // wait for button release
-  Serial.println("button");
+  // Serial.println("button");
   
 }
