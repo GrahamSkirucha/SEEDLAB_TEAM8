@@ -50,6 +50,12 @@ void loop() {
     y = y + deltaY;
     phi = phi + deltaPhi;
     //print everything
+    Serial.print("Left Counts: ");
+    Serial.print(change1);
+    Serial.print("\t");
+    Serial.print("Right Counts: ");
+    Serial.print(change2);
+    Serial.print("\t");
     Serial.print("Left: ");
     Serial.print(leftSpeed);
     Serial.print("\t");
