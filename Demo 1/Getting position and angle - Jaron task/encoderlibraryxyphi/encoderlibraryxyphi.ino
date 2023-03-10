@@ -11,9 +11,11 @@ int prevTime;
 int duration;
 float leftSpeed;
 float rightSpeed;
+float leftVelocity;
+float rightVelocity;
 float x;
 float y;
-float phi;
+float phi = 0;
 #define WHEELRADIUS 0.0762
 #define BETWEENWHEELS 0.1524
 #define ROTATIONCOUNTS 3000
@@ -39,34 +41,41 @@ void loop() {
     duration = timeKept - prevTime;
     float durationSec = duration / 1000.0;
     //calculate velocity using the change in encoder counts and duration with constants
-    leftSpeed = WHEELRADIUS*change1*2*PI/(ROTATIONCOUNTS * durationSec);
-    rightSpeed = WHEELRADIUS*change2*2*PI/(ROTATIONCOUNTS * durationSec);
+    leftVelocity = WHEELRADIUS*change1*2*PI/(ROTATIONCOUNTS * durationSec);
+    leftSpeed = change1/durationSec;
+    rightVelocity = WHEELRADIUS*change2*2*PI/(ROTATIONCOUNTS * durationSec);
+    rightSpeed = change2/durationSec;
     //calculate the changes in position
-    float deltaX = durationSec * cos(phi) * (leftSpeed + rightSpeed) / 2;
-    float deltaY = durationSec * sin(phi) * (leftSpeed + rightSpeed) / 2;
-    float deltaPhi = durationSec * (leftSpeed - rightSpeed) / BETWEENWHEELS;
+    float deltaX = durationSec * cos(phi) * (leftVelocity + rightVelocity) / 2;
+    float deltaY = durationSec * sin(phi) * (leftVelocity + rightVelocity) / 2;
+    float deltaPhi = durationSec * (leftVelocity - rightVelocity) / BETWEENWHEELS;
     //calculate new position
     x = x + deltaX;
     y = y + deltaY;
     phi = phi + deltaPhi;
     //set bounds on phi - if phi is greater than 2PI subtract 2PI, and if phi is less than -2PI add 2*PI
-    if(phi > (2 * PI)){
-      phi -= 2* PI;
+    if(phi > 2 * PI){
+      Serial.println("Greater than 2PI");
+      phi -= 2 * PI;
     }
-    if(phi < (2 * PI)){
+    if(phi < (-2 * PI)){
+      Serial.println("Less than 2PI");
       phi += 2 * PI;
     }
     //print everything
+    Serial.print("Time: ");
+    Serial.print(durationSec);
+    Serial.print("\t");
     Serial.print("Left Counts: ");
     Serial.print(change1);
     Serial.print("\t");
     Serial.print("Right Counts: ");
     Serial.print(change2);
     Serial.print("\t");
-    Serial.print("Left: ");
+    Serial.print("Left Counts per Second: ");
     Serial.print(leftSpeed);
     Serial.print("\t");
-    Serial.print("Right: ");
+    Serial.print("Right Counts per Second: ");
     Serial.print(rightSpeed);
     Serial.print("\t");
     Serial.print("X: ");
@@ -76,11 +85,18 @@ void loop() {
     Serial.print(y);
     Serial.print("\t");
     Serial.print("Phi: ");
-    Serial.println(phi);
+    Serial.print(phi);
+    Serial.print("\tDelta phi: ");
+    Serial.print(deltaPhi);
     //update prev* variables
     prevRead1 = read1;
     prevRead2 = read2;
     prevTime = timeKept;
+    //take loop speed and print it
+    int loopSpeed = millis() - timeKept;
+    Serial.print("\tLoop Speed (ms): ");
+    Serial.println(loopSpeed);
+    // Serial.println(PI);
   }
   
 }
