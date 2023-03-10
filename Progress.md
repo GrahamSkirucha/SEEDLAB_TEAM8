@@ -13,5 +13,5 @@
 |Tasks to be done|Tasks in progress | Tasks done|
 |---|---|---|
 |||1.1 - Detect an aruco marker and determine the robot's angle relative to the marker - Ryan Y|
-||1.2 - Determine the robot's current angle and position - Jaron O||
+|||1.2 - Determine the robot's current angle and position - Jaron O|
 ||1.3 - Move the robot in a straight line for 1 to 10 feet - Ryan S, Graham S, and Max W||
