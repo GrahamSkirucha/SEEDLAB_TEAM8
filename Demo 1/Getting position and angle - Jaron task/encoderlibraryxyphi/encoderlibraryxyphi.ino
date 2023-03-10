@@ -49,6 +49,13 @@ void loop() {
     x = x + deltaX;
     y = y + deltaY;
     phi = phi + deltaPhi;
+    //set bounds on phi - if phi is greater than 2PI subtract 2PI, and if phi is less than -2PI add 2*PI
+    if(phi > (2 * PI)){
+      phi -= 2* PI;
+    }
+    if(phi < (2 * PI)){
+      phi += 2 * PI;
+    }
     //print everything
     Serial.print("Left Counts: ");
     Serial.print(change1);
