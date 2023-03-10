@@ -26,17 +26,21 @@ void setup() {
 }
 
 void loop() {
+  //read the encoders
   int read1 = enc1.read();
   int read2 = enc2.read();
+  //only compute values if the readings have changed
   if((read1 != prevRead1) || (read2 != prevRead2)){
-    //read the encoders
+    //compute the change in the readings
+    int change1 = read1 - prevRead1;
+    int change2 = read2 - prevRead2;
     //take the time and calculate the loop time
     timeKept = millis();
     duration = timeKept - prevTime;
     float durationSec = duration / 1000.0;
-    //calculate velocity using encoder counts and duration with constants
-    leftSpeed = WHEELRADIUS*read1*2*PI/(ROTATIONCOUNTS * durationSec);
-    rightSpeed = WHEELRADIUS*read2*2*PI/(ROTATIONCOUNTS * durationSec);
+    //calculate velocity using the change in encoder counts and duration with constants
+    leftSpeed = WHEELRADIUS*change1*2*PI/(ROTATIONCOUNTS * durationSec);
+    rightSpeed = WHEELRADIUS*change2*2*PI/(ROTATIONCOUNTS * durationSec);
     //calculate the changes in position
     float deltaX = durationSec * cos(phi) * (leftSpeed + rightSpeed) / 2;
     float deltaY = durationSec * sin(phi) * (leftSpeed + rightSpeed) / 2;
