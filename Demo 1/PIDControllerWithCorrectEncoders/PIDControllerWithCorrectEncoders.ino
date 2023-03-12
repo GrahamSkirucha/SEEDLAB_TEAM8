@@ -57,8 +57,8 @@ void setup() {
   //motor control setup
   // ---
   md.init();
-  motor1Speed = 290;
-  motor2Speed = 300;
+  motor1Speed = 300;
+  motor2Speed = 340;
   // ---
   //fudge factors
   // ---
@@ -135,11 +135,11 @@ void loop() {
     motor1Speed += 1;
     // desiredDistance -= sin(phi);
   }
-  if((motor1Speed > 300) || (motor2Speed > 300)){
+  if((motor1Speed > 350) || (motor2Speed > 350)){
     motor1Speed -= 10;
     motor2Speed -= 10;
   }
-  Serial.println(distWithFudge);
+  Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
   // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
   // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
   // Serial.println("cm: " + String(int(x * 100)));
