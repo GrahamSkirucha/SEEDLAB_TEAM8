@@ -22,13 +22,15 @@ double phi = 0.0; //calculated angle from both encoder readings assuming the sta
 #define ROTATIONCOUNTS 3000 //encoders are 3000 counts per every 360 degrees
 #define FEETTOMETERS 0.3048
 
-double desiredFeet = 3; //10 ft
+double desiredFeet = 5; //10 ft
 double desiredDistance;
-double distanceFudgeFactor = 0.05;
+double distanceFudgeFactor = 0.07;
 double distWithFudge = 0;
 int motor1Speed = 0;
 int motor2Speed = 0;
-double halveAt = 0.9;
+double halveAt = 0.1;
+int printOnce = 0;
+int motorMax = 350;
 
 //PID Global Variables
 // #include <PID_v1.h>
@@ -64,7 +66,6 @@ void setup() {
   // ---
   desiredDistance = desiredFeet * FEETTOMETERS;
   distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
-  halveAt = distWithFudge * halveAt;
   // ---
   //Serial
   Serial.begin(115200);
@@ -119,6 +120,7 @@ void loop() {
     md.setM1Speed(0);
     md.setM2Speed(0);
     delay(2);
+    printOnce = 1;
   }
   double velocityDiff = leftVelocity - rightVelocity;
   if(velocityDiff > 0){
@@ -128,18 +130,31 @@ void loop() {
     motor1Speed += 10;
   }
   if(phi > 0){
-    motor2Speed += 1;
+    motor2Speed += 2;
     // desiredDistance += sin(phi);
   }
   if(phi < 0){
-    motor1Speed += 1;
+    motor1Speed += 2;
     // desiredDistance -= sin(phi);
   }
-  if((motor1Speed > 350) || (motor2Speed > 350)){
+
+  while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
     motor1Speed -= 10;
     motor2Speed -= 10;
   }
-  Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
+
+  //implement actual controller here?
+  if(x > distWithFudge - halveAt){
+    double error = 3500 * (distWithFudge - x);
+    motorMax = int(error);
+    Serial.println(motorMax);
+  }
+  Serial.println(int(x * 10000));
+  if(printOnce){
+    Serial.println(int(distWithFudge * 10000));
+    exit(0);
+  } 
+  // Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
   // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
   // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
   // Serial.println("cm: " + String(int(x * 100)));
