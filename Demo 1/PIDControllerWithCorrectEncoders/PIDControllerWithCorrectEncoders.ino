@@ -59,19 +59,24 @@ void setup() {
   prevRead1 = 0;
   prevRead2 = 0;
   // ---
+
   //motor control setup
   // ---
   md.init();
   motor1Speed = 300;
   motor2Speed = 340;
   // ---
+
   //fudge factors
   // ---
   desiredDistance = desiredFeet * FEETTOMETERS;
   distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
   // ---
+
   //Serial
+  // ---
   Serial.begin(115200);
+  // ---
 }
 
 //reads encoders and writes to motors (only moves in a straight line for now)
@@ -167,6 +172,10 @@ void loop() {
     motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
     // Serial.println(motorMax);
   }
+  // ---
+
+  // printline debugging
+  // ---
   // Serial.println(int(x * 10000));
   // if(printOnce){
   //   Serial.println(int(distWithFudge * 10000));
@@ -176,5 +185,6 @@ void loop() {
   // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
   // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
   // Serial.println("cm: " + String(int(x * 100)));
+  // ---
 }
 
