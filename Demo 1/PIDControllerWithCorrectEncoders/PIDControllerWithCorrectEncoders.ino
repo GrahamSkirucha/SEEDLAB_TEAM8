@@ -7,7 +7,6 @@
 Encoder enc1 (2, 5);
 Encoder enc2 (3, 6);
 //constants
-#define ROTATIONCOUNTS 3000 //encoders are 3000 counts per every 360 degrees
 #define FEETTOMETERS 0.3048 //conversion factor from feet provided by the user to meters that the robot can measure
 //Dual MC Motor Shield moves the motors
 #include "DualMC33926MotorShield.h"
@@ -39,6 +38,7 @@ double y = 0; //calculated y position from both encoder readings
 double p = 0.0; //calculated angle from both encoder readings assuming the starting orientation is 0 degrees
 // ---
 //these constants already exist
+#define ROTATIONCOUNTS 3000 //encoders are 3000 counts per every 360 degrees
 #define WHEELRADIUS 0.0762 //constant wheel radius (calculates velocity)
 #define BETWEENWHEELS 0.1524 //constant distance between the wheels (calculates p)
 
@@ -65,7 +65,7 @@ void setup() {
   distWithFudge = desiredDist + desiredDist * distanceFudgeFactor;
   // ---
   // ----------
-  
+
   //Serial
   // ---
   Serial.begin(115200);
@@ -136,10 +136,10 @@ void loop() {
   double velocityDiff = leftVelocity - rightVelocity;
   //turns up the motor speed of the motor that is going slower
   if(velocityDiff > 0){
-    motor2Speed += 10; //positive difference means the right wheel needs to go faster
+    motor1Speed += 10; //positive difference means the right wheel needs to go faster
   }
   else if(velocityDiff < 0){
-    motor1Speed += 10; //negative difference means the left wheel needs to go faster
+    motor2Speed += 10; //negative difference means the left wheel needs to go faster
   }
   //turns up the speed of the motor that needs to compensate for a change in robot angle - smaller change to motor speed
   if(p > 0){
@@ -171,11 +171,11 @@ void loop() {
   // if(printOnce){
   //   Serial.println(int(distWithFudge * 10000));
   //   exit(0);
-  // } 
-  // Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
-  // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
-  // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
-  // Serial.println("cm: " + String(int(x * 100)));
+  // }
+  Serial.println("Velocity diff: " + String(velocityDiff));  
+  Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
+  Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
+  Serial.println("cm: " + String(int(x * 100)));
   // ---
 }
 
