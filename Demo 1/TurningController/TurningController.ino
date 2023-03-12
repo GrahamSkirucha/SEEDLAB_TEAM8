@@ -30,7 +30,7 @@ const double DEGREESTORADIANS = PI / 180.0;
 double desiredDegrees = 90; //deired angle in degrees - will be converted to radians
 double desiredPhi; //desired distance in radians
 double phudge = 0.0; //fudge factor so that the robot moves the desired angle - scales with angle
-double phiAndPhudge = 1.0; //angle the robot will use as its reference to drive to
+double phiAndPhudge = 2.0; //angle the robot will use as its reference to drive to
 int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 1
 int motor2Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 2
 double controllerThreshold = 0.1; //distance away from the destination that the controller will kick in
@@ -75,7 +75,7 @@ void setup() {
   //fudge factors
   // ---
   desiredPhi = desiredDegrees * DEGREESTORADIANS;
-  phiAndPhudge = desiredPhi + desiredPhi * phudge;
+  phiAndPhudge = desiredPhi * phudge;
   // ---
 
   //Serial
