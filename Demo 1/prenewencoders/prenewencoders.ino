@@ -100,7 +100,7 @@ void encoder1(){
   int e1stateB = digitalRead(e1pinB);
   //determine clockwise or counter-clockwise
   time1Kept = millis();
-  double duration = (timeKept - prev1Time);
+  double duration = (time1Kept - prev1Time);
   //makes sure that there are no infinite velocities
   if(duration == 0.0) return;
   //the value of pi in arduino is M_PI
@@ -122,7 +122,7 @@ void encoder1(){
   }
   //adjust the flag to print the new value of counts in the loop
   isrEntered = 1;
-  prev1Time = timeKept;
+  prev1Time = time1Kept;
 
   if (v >= 0) {
     enc1Counts++;
@@ -136,7 +136,7 @@ void encoder2(){
   int e2stateA = digitalRead(e2pinA);
   int e2stateB = digitalRead(e2pinB);
   time2Kept = millis();
-  double duration = (timeKept - prev2Time);
+  double duration = (time2Kept - prev2Time);
   //make sure there are no infinite velocities that result in nan
   if(duration == 0.0) return;
   //the value of pi in arduino is M_PI
@@ -158,7 +158,7 @@ void encoder2(){
   }
   //adjust the flag to print the new value of counts in the loop
   isrEntered = 1;
-  prev2Time = timeKept;
+  prev2Time = time2Kept;
   if (v >= 0) {
     enc2Counts++;
   } else {
@@ -345,15 +345,15 @@ void loop() {
 
 
   // // serial
-  float angleRecieved = 360 * 0.882;
+  float angleRecieved = 360 * 0.60;
   int ldir = (angleRecieved >= 0) ? -1 : 1; 
   int rdir = -ldir;
   int turnCounts = angleToCounts(abs(angleRecieved));
 
-  //(turnCounts, ldir, rdir);
+  move(turnCounts, ldir, rdir);
   // delay(100);
   //Serial.println("desD: " +String(desiredDistance));
-  move(desiredDistance, FORW, FORW);
+  //move(desiredDistance, FORW, FORW);
   //Serial.println("done");
 
   //wait for button press
