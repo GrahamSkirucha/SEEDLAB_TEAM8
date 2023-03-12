@@ -30,7 +30,7 @@ const double DEGREESTORADIANS = PI / 180.0;
 double desiredDegrees = 90; //deired angle in degrees - will be converted to radians
 double desiredPhi; //desired distance in radians
 double phudge = 0.0; //fudge factor so that the robot moves the desired angle - scales with angle
-double phiAndPhudge = 0.0; //angle the robot will use as its reference to drive to
+double phiAndPhudge = 1.0; //angle the robot will use as its reference to drive to
 int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 1
 int motor2Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 2
 double controllerThreshold = 0.1; //distance away from the destination that the controller will kick in
@@ -130,7 +130,7 @@ void loop() {
   //driving the motors
   // ---
   //sets the speed of both motors using the mc motor shield library
-  if(phi < desiredPhi){
+  if(phi < phiAndPhudge){
     md.setM1Speed(motor1Speed);
     md.setM2Speed(motor2Speed);
     delay(2);
@@ -150,16 +150,16 @@ void loop() {
   double velocityDiff = leftVelocity + rightVelocity;
   //turns up the motor speed of the motor that is going slower
   if(velocityDiff > 0){
-    motor2Speed += 10; //positive difference means the right wheel needs to go faster
+    motor2Speed -= 10; //positive difference means the right wheel needs to go faster
   }
   else if(velocityDiff < 0){
     motor1Speed += 10; //negative difference means the left wheel needs to go faster
   }
   //here would be the place to adjust for small changes in translation, but I cannot think of a way to do that right now
   //make sure both motor speed integers are below the max speed
-  while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
+  while((motor1Speed > motorMax) || (abs(motor2Speed) > motorMax)){
     motor1Speed -= 10;
-    motor2Speed -= 10;
+    motor2Speed += 10;
   }
   // ---
 
@@ -175,14 +175,15 @@ void loop() {
 
   // printline debugging
   // ---
-  // Serial.println(int(x * 10000));
+  Serial.println(int(phiAndPhudge*10000));
+  Serial.println(int(phi * 10000));
   if(printOnce){
-    Serial.println(int(distWithFudge * 10000));
+    Serial.println(int(phiAndPhudge * 10000));
     exit(0);
   }
-  // Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
-  // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
-  // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
+  Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
+  Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
+  Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
   // Serial.println("cm: " + String(int(x * 100)));
   // ---
 }
