@@ -95,7 +95,7 @@ void loop() {
   if((read1 != prevRead1) || (read2 != prevRead2)){
     //compute the change in the readings
     int change1 = read1 - prevRead1;
-    int change2 = read2 - prevRead2;
+    int change2 = prevRead2 - read2;
     //take the time and calculate the loop time
     timeKept = millis();
     duration = timeKept - prevTime;

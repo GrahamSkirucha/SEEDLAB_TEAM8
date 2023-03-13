@@ -21,6 +21,7 @@ double phi = 0.0; //calculated angle from both encoder readings assuming the sta
 #define BETWEENWHEELS 0.1524 //constant distance between the wheels (calculates phi)
 #define ROTATIONCOUNTS 3000 //encoders are 3000 counts per every 360 degrees
 #define FEETTOMETERS 0.3048 //conversion factor from feet provided by the user to meters that the robot can measure
+const double CONVERTDEGREESRADIANS = PI / 180.0;
 
 double desiredFeet = 5; //desired distance in feet - will be converted to meters
 double desiredDistance; //desired distance in meters
@@ -30,8 +31,14 @@ int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage
 int motor2Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 2
 double controllerThreshold = 0.1; //distance away from the destination that the controller will kick in
 int printOnce = 0; //flag for testing the final distance the robot travelled and comparing it to the input distance
-int motorMax = 350; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
+int motorMax = 200; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
 int motorDecayFactor = motorMax * 10;
+int turningFlag = true; //starts the code turning
+int degreeInput = 180;
+int degrees = degreeInput / 2;
+double desiredPhi = degrees * CONVERTDEGREESRADIANS;
+double phudge = 2.0;
+double phiAndPhudge = desiredPhi + desiredPhi * phudge;
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
 //PID Global Variables
@@ -90,7 +97,7 @@ void loop() {
   if((read1 != prevRead1) || (read2 != prevRead2)){
     //compute the change in the readings
     int change1 = read1 - prevRead1;
-    int change2 = read2 - prevRead2;
+    int change2 = prevRead2 - read2;
     //take the time and calculate the loop time
     timeKept = millis();
     duration = timeKept - prevTime;
@@ -121,68 +128,132 @@ void loop() {
     prevTime = timeKept;
   }
   // ---
+  
 
   //driving the motors
   // ---
-  //sets the speed of both motors using the mc motor shield library
-  if(x < distWithFudge){
-    md.setM1Speed(motor1Speed);
-    md.setM2Speed(motor2Speed);
-    delay(2);
+  if(turningFlag){
+    //sets the speed of both motors using the mc motor shield library
+    if((motor1Speed <= 10) || (motor2Speed <= 10)){
+      turningFlag = false;
+      phi = 0;
+      x = 0;
+      y = 0;
+      motorMax = 350;
+      motor1Speed = 300;
+      motor2Speed = 340;     
+    }
+    if(phi < phiAndPhudge){
+      md.setM1Speed(motor1Speed);
+      md.setM2Speed(-motor2Speed);
+      delay(2);
+    }
+    //stops the robot if it has reached its destination
+    else{
+      md.setM1Speed(0);
+      md.setM2Speed(0);
+      delay(2);
+      // printOnce = 1; //exit code for debugging purposes
+      turningFlag = false;
+      phi = 0;
+      x = 0;
+      y = 0;
+      motorMax = 350;
+      motor1Speed = 300;
+      motor2Speed = 340;
+    }
   }
-  //stops the robot if it has reached its destination
   else{
-    md.setM1Speed(0);
-    md.setM2Speed(0);
-    delay(2);
-    printOnce = 1; //exit code for debugging purposes
+    //sets the speed of both motors using the mc motor shield library
+    if((motor1Speed <= 10) || (motor2Speed <= 10)){
+      exit(0);    
+    }
+    if(x < distWithFudge){
+      md.setM1Speed(motor1Speed);
+      md.setM2Speed(motor2Speed);
+      delay(2);
+    }
+    //stops the robot if it has reached its destination
+    else{
+      md.setM1Speed(0);
+      md.setM2Speed(0);
+      delay(2);
+      printOnce = 1; //exit code for debugging purposes
+    }
   }
   // ---
 
   //stabilizing the velocity
   // ---
   //takes the difference of the velocity
-  double velocityDiff = leftVelocity - rightVelocity;
-  //turns up the motor speed of the motor that is going slower
-  if(velocityDiff > 0){
-    motor2Speed += 10; //positive difference means the right wheel needs to go faster
+  if(turningFlag){
+    double velocityDiff = leftVelocity + rightVelocity;
+    if(velocityDiff > 0){
+      motor2Speed += 10;
+    }
+    else if(velocityDiff < 0){
+      motor1Speed += 10;
+    }
+    //not sure how to correct for changes in x and y, but we can fix that if we get there
+    //make sure both motor speed integers are below the max speed
+    while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
+      motor1Speed -= 10;
+      motor2Speed -= 10;
+    } 
   }
-  else if(velocityDiff < 0){
-    motor1Speed += 10; //negative difference means the left wheel needs to go faster
-  }
-  //turns up the speed of the motor that needs to compensate for a change in robot angle - smaller change to motor speed
-  if(phi > 0){
-    motor2Speed += 2; //positive angle means the right motor needs to go faster
-  }
-  if(phi < 0){
-    motor1Speed += 2; //negative angle means the left motor needs to go faster
-  }
-  //make sure both motor speed integers are below the max speed
-  while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
-    motor1Speed -= 10;
-    motor2Speed -= 10;
+  else{
+    double velocityDiff = leftVelocity - rightVelocity;
+    //turns up the motor speed of the motor that is going slower
+    if(velocityDiff > 0){
+      motor2Speed += 10; //positive difference means the right wheel needs to go faster
+    }
+    else if(velocityDiff < 0){
+      motor1Speed += 10; //negative difference means the left wheel needs to go faster
+    }
+    //turns up the speed of the motor that needs to compensate for a change in robot angle - smaller change to motor speed
+    if(phi > 0){
+      motor2Speed += 2; //positive angle means the right motor needs to go faster
+    }
+    if(phi < 0){
+      motor1Speed += 2; //negative angle means the left motor needs to go faster
+    }
+    //make sure both motor speed integers are below the max speed
+    while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
+      motor1Speed -= 10;
+      motor2Speed -= 10;
+    }    
   }
   // ---
 
   //implementing the controller
   // ---
   //only implement the controller if the robot is within the distance specified by controllerThreshold
-  if(x > distWithFudge - controllerThreshold){
-    double error = motorDecayFactor * (distWithFudge - x); //calculate the amount of distance left and multiply it by the motorDecayFactor
-    motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
-    // Serial.println(motorMax);
+  if(turningFlag){
+    if(phi > phiAndPhudge - controllerThreshold){
+      double error = motorDecayFactor * (phiAndPhudge - phi); //calculate the amount of distance left and multiply it by the motorDecayFactor
+      motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
+    }
   }
+  else{
+    if(x > distWithFudge - controllerThreshold){
+      double error = motorDecayFactor * (distWithFudge - x); //calculate the amount of distance left and multiply it by the motorDecayFactor
+      motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
+      // Serial.println(motorMax);
+    }    
+  }
+  
   // ---
-
   // printline debugging
   // ---
-  // Serial.println(int(x * 10000));
+  if(turningFlag){
+    Serial.println(int(phi * 10000));
+  }
   // if(printOnce){
   //   Serial.println(int(distWithFudge * 10000));
   //   exit(0);
   // } 
   // Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
-  // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
+  Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
   // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
   // Serial.println("cm: " + String(int(x * 100)));
   // ---
