@@ -326,7 +326,7 @@ void loop() {
 
 
   // // serial
-  float angleRecieved = 60;
+  float angleRecieved = 90;
   int ldir = (angleRecieved >= 0) ? -1 : 1; 
   int rdir = -ldir;
   int turnCounts = angleToCounts(angleRecieved);
