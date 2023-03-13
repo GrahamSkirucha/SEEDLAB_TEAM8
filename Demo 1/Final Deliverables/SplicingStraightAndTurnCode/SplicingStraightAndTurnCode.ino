@@ -95,7 +95,7 @@ void loop() {
   int read2 = enc2.read();
   //only compute values if the readings have changed
   if((read1 != prevRead1) || (read2 != prevRead2)){
-    //compute the change in the readings
+    //compute the change in the readings - check that the robot is correctly computing positive velocities!!!
     int change1 = read1 - prevRead1;
     int change2 = prevRead2 - read2;
     //take the time and calculate the loop time
