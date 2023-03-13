@@ -196,7 +196,7 @@ void move(float DISTANCE, int LDIR, int RDIR) {
 
   while (1 == 1) {
     prevTime = millis();
-    Serial.println(String(enc1Counts));
+    // Serial.println(String(enc1Counts));
     
     //determine desired speed
     if (enc1Counts < accelDist) {
@@ -283,8 +283,8 @@ void move(float DISTANCE, int LDIR, int RDIR) {
     
     analogWrite(rightMotorPow, abs(rightPWMOut));
       //delay(deltaT);
-    Serial.println("enc1Counts");
-    Serial.println("leftSpeed: :" + String(leftSpeed * 1000) + " rightspeed: " + String(rightSpeed * 1000));
+    // Serial.println("enc1Counts");
+    // Serial.println("leftSpeed: :" + String(leftSpeed * 1000) + " rightspeed: " + String(rightSpeed * 1000));
         //Serial.println("lPWM: " + String(leftPWMOut) + " RPWM: " + String(rightPWMOut) + "\nrightErr: " + String(rightError) + " leftErr: " + String(leftError));
    
     if ((enc1Counts >= DISTANCE && enc1Counts <= DISTANCE + 30) && (leftVOut == 0 || rightVOut == 0)) {
@@ -345,15 +345,15 @@ void loop() {
 
 
   // // serial
-  float angleRecieved = 360 * 0.60;
+  float angleRecieved = 360 * 0.882;
   int ldir = (angleRecieved >= 0) ? -1 : 1; 
   int rdir = -ldir;
   int turnCounts = angleToCounts(abs(angleRecieved));
 
   move(turnCounts, ldir, rdir);
   // delay(100);
-  //Serial.println("desD: " +String(desiredDistance));
-  //move(desiredDistance, FORW, FORW);
+  Serial.println("desD: " +String(desiredDistance));
+  move(desiredDistance, FORW, FORW);
   //Serial.println("done");
 
   //wait for button press
