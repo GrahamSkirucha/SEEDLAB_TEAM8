@@ -15,7 +15,7 @@ DualMC33926MotorShield md;
 
 //To go inside the function
 // ---
-double desiredFeet = 5; //desired distance in feet - will be converted to meters
+double desiredFeet = 7; //desired distance in feet - will be converted to meters
 double desiredDist; //desired distance in meters
 double distanceFudgeFactor = 0.07; //fudge factor so that the robot moves the desired distance - scales with distance
 double distWithFudge = 0; //distance the robot will use as a reference to drive to

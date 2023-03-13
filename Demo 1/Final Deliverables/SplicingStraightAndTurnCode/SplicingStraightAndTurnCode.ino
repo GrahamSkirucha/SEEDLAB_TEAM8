@@ -23,9 +23,9 @@ double phi = 0.0; //calculated angle from both encoder readings assuming the sta
 #define FEETTOMETERS 0.3048 //conversion factor from feet provided by the user to meters that the robot can measure
 const double CONVERTDEGREESRADIANS = PI / 180.0;
 
-double desiredFeet = 5; //desired distance in feet - will be converted to meters
+double desiredFeet = 2; //desired distance in feet - will be converted to meters
 double desiredDistance; //desired distance in meters
-double distanceFudgeFactor = 0.07; //fudge factor so that the robot moves the desired distance - scales with distance
+double distanceFudgeFactor = 0.25; //fudge factor so that the robot moves the desired distance - scales with distance
 double distWithFudge = 0; //distance the robot will use as a reference to drive to
 int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 1
 int motor2Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 2
@@ -34,7 +34,7 @@ int printOnce = 0; //flag for testing the final distance the robot travelled and
 int motorMax = 200; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
 int motorDecayFactor = motorMax * 10;
 int turningFlag = true; //starts the code turning
-int degreeInput = 180;
+int degreeInput = 90;
 int degrees = degreeInput / 2;
 double desiredPhi = degrees * CONVERTDEGREESRADIANS;
 double phudge = 2.0;
@@ -116,12 +116,12 @@ void loop() {
     y = y + deltaY;
     phi = phi + deltaPhi;
     //set bounds on phi - if phi is greater than 2PI subtract 2PI, and if phi is less than -2PI add 2*PI
-    if(phi > 2 * PI){
-      phi -= 2 * PI;
-    }
-    if(phi < (-2 * PI)){
-      phi += 2 * PI;
-    }
+    // if(phi > 2 * PI){
+    //   phi -= 2 * PI;
+    // }
+    // if(phi < (-2 * PI)){
+    //   phi += 2 * PI;
+    // }
     //set the prev* variables so that the next loop will use these values as a reference
     prevRead1 = read1;
     prevRead2 = read2;
@@ -166,6 +166,8 @@ void loop() {
   else{
     //sets the speed of both motors using the mc motor shield library
     if((motor1Speed <= 10) || (motor2Speed <= 10)){
+      md.setM1Speed(0);
+      md.setM2Speed(0);
       exit(0);    
     }
     if(x < distWithFudge){
