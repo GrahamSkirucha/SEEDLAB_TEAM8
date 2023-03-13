@@ -81,10 +81,8 @@ void loop() {
   int read2 = enc2.read();
   //only compute values if the readings have changed
   if((read1 != prevRead1) || (read2 != prevRead2)){
-    //compute the change in the readings
+    //compute the change in the readings - check to make sure they are the right values
     int change1 = read1 - prevRead1;
-    //encoder 2 might read negative values for no f*ckn reason!!!
-    //in such case, make change 2 negative
     int change2 = prevRead2 - read2;
     //take the time and calculate the loop time
     timeKept = millis();
