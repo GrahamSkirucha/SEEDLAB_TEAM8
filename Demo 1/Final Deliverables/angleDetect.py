@@ -41,10 +41,10 @@ while (True):
         bottom_left[1] = int(bottom_left[1])
             
         #Finds the angle to the marker
-        angle = ((top_left[0]+top_right[0])/2-320)*(53.5/640)
+        angle = ((top_left[0]+top_right[0])/2-320)*(65/640)
         angle = -1*angle
 
-        frame = cv2.putText(frame,str(angle),(160,320),cv2.FONT_HERSHEY_SIMPLEX,3,(255,0,0),3)
+        frame = cv2.putText(frame,str(angle),(320,160),cv2.FONT_HERSHEY_SIMPLEX,3,(255,0,0),3)
 
     if cv2.waitKey(1)&0xFF==ord('q'):
         break
