@@ -18,26 +18,27 @@ double x = 0; //calculated x position from both encoder readings
 double y = 0; //calculated y position from both encoder readings
 double phi = 0.0; //calculated angle from both encoder readings assuming the starting orientation is 0 degrees
 #define WHEELRADIUS 0.0762 //constant wheel radius (calculates velocity)
-#define BETWEENWHEELS 0.1524 //constant distance between the wheels (calculates phi)
+#define BETWEENWHEELS 0.2713 //constant distance between the wheels (calculates phi)
 #define ROTATIONCOUNTS 3000 //encoders are 3000 counts per every 360 degrees
 #define FEETTOMETERS 0.3048 //conversion factor from feet provided by the user to meters that the robot can measure
 const double CONVERTDEGREESRADIANS = PI / 180.0;
 
 double desiredFeet = 2; //desired distance in feet - will be converted to meters
 double desiredDistance; //desired distance in meters
-double distanceFudgeFactor = 0.25; //fudge factor so that the robot moves the desired distance - scales with distance
+double distanceFudgeFactor = 0.1; //fudge factor so that the robot moves the desired distance - scales with distance
 double distWithFudge = 0; //distance the robot will use as a reference to drive to
 int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 1
 int motor2Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 2
 double controllerThreshold = 0.1; //distance away from the destination that the controller will kick in
 int printOnce = 0; //flag for testing the final distance the robot travelled and comparing it to the input distance
-int motorMax = 200; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
+int motorMax = 150; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
 int motorDecayFactor = motorMax * 10;
 int turningFlag = true; //starts the code turning
 int degreeInput = 90;
-int degrees = degreeInput / 2;
+// int degrees = degreeInput / 2;
+int degrees = degreeInput;
 double desiredPhi = degrees * CONVERTDEGREESRADIANS;
-double phudge = 2.0;
+double phudge = 0.0;
 double phiAndPhudge = desiredPhi + desiredPhi * phudge;
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
@@ -142,7 +143,9 @@ void loop() {
       y = 0;
       motorMax = 350;
       motor1Speed = 300;
-      motor2Speed = 340;     
+      motor2Speed = 340;
+      //pause for effect
+      delay(200);   
     }
     if(phi < phiAndPhudge){
       md.setM1Speed(motor1Speed);
@@ -256,7 +259,7 @@ void loop() {
   //   exit(0);
   // } 
   // Serial.println("left speed: " + String(motor1Speed) + "\tright speed: " + String(motor2Speed));
-  Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
+  // Serial.println("Left Velocity: " + String(leftVelocity) + "\tRight Velocity: " + String(rightVelocity));
   // Serial.println("Motor 1: " + String(motor1Speed) + "\tMotor 2: " + String(motor2Speed));
   // Serial.println("cm: " + String(int(x * 100)));
   // ---
