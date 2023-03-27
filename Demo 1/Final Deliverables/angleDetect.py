@@ -26,7 +26,6 @@ while (True):
     if ids is None:
         print("No markers found")
 
-    
     else:
         
         #Defines corners of marker if present
@@ -44,21 +43,8 @@ while (True):
         #Finds the angle to the marker
         angle = ((top_left[0]+top_right[0])/2-320)*(53.5/640)
         angle = -1*angle
-#        centerX = (top_left[0]+top_right[0])/2
-#        centerY = (top_left[1]+top_right[1])/2
-#        if centerX > 640 and centerY >0:
-#            cv2.putText(greyscaled,'0',(100,400),cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),3)
-#        elif centerX < 640 and centerY >0:
-#            cv2.putText(greyscaled,'pi/2',(100,400),cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),3)
-#        elif centerX < 640 and centerY <0:
-#            cv2.putText(greyscaled,'pi',(100,400),cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),3)
-#        elif centerX > 640 and centerY <0:
-#            cv2.putText(greyscaled,'3pi/2',(100,400),cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),3)
-#
-        #Displays text
-#        print("Aruco marker ID detected:",ids)
-#        print("Angle from marker:",angle)
-        frame = cv2.putText(frame,str(angle),(100,400),cv2.FONT_HERSHEY_SIMPLEX,3,(255,0,0),3)
+
+        frame = cv2.putText(frame,str(angle),(160,320),cv2.FONT_HERSHEY_SIMPLEX,3,(255,0,0),3)
 
     if cv2.waitKey(1)&0xFF==ord('q'):
         break
