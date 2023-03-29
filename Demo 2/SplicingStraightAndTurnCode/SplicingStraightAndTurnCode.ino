@@ -60,38 +60,8 @@ DualMC33926MotorShield md;
 //   }
 // }
 
-//sets the necessary variables for the encoders, mc motor shield library, fudge factors, and Serial
-void setup() {
-  //encoder reading setup
-  // ---
-  prevRead1 = 0;
-  prevRead2 = 0;
-  // ---
-
-  //motor control setup
-  // ---
-  md.init();
-  motor1Speed = 300;
-  motor2Speed = 340;
-  // ---
-
-  //fudge factors
-  // ---
-  desiredDistance = desiredFeet * FEETTOMETERS;
-  distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
-  // ---
-
-  //Serial
-  // ---
-  Serial.begin(115200);
-  // ---
-}
-
-//reads encoders and writes to motors (only moves in a straight line for now)
-void loop() {
-  //encoder reading loop code
-  //---  
-  //read the encoders
+void readEncoders(){
+  //take readings
   int read1 = enc1.read();
   int read2 = enc2.read();
   //only compute values if the readings have changed
@@ -118,24 +88,23 @@ void loop() {
     y = y + deltaY;
     phi = phi + deltaPhi;
     //set bounds on phi - if phi is greater than 2PI subtract 2PI, and if phi is less than -2PI add 2*PI
-    // if(phi > 2 * PI){
-    //   phi -= 2 * PI;
-    // }
-    // if(phi < (-2 * PI)){
-    //   phi += 2 * PI;
-    // }
+    if(phi > 2 * PI){
+      phi -= 2 * PI;
+    }
+    if(phi < (-2 * PI)){
+      phi += 2 * PI;
+    }
     //set the prev* variables so that the next loop will use these values as a reference
     prevRead1 = read1;
     prevRead2 = read2;
     prevTime = timeKept;
   }
-  // ---
-  
+}
 
-  //driving the motors
-  // ---
+void driveMotors(){
   if(turningFlag){
     //sets the speed of both motors using the mc motor shield library
+    // if the motor speeds are too slow set them to zero, re
     if((motor1Speed <= 10) || (motor2Speed <= 10)){
       turningFlag = false;
       phi = 0;
@@ -187,10 +156,9 @@ void loop() {
       printOnce = 1; //exit code for debugging purposes
     }
   }
-  // ---
+}
 
-  //stabilizing the velocity
-  // ---
+void stabilizeVelocity(){
   //takes the difference of the velocity
   if(turningFlag){
     double velocityDiff = leftVelocity + rightVelocity;
@@ -229,10 +197,9 @@ void loop() {
       motor2Speed -= 10;
     }    
   }
-  // ---
+}
 
-  //implementing the controller
-  // ---
+void maxVelocityController(){
   //only implement the controller if the robot is within the distance specified by controllerThreshold
   if(turningFlag){
     if(phi > phiAndPhudge - controllerThreshold){
@@ -247,13 +214,63 @@ void loop() {
       // Serial.println(motorMax);
     }    
   }
-  
+}
+
+//sets the necessary variables for the encoders, mc motor shield library, fudge factors, and Serial
+void setup() {
+  //encoder reading setup
   // ---
+  prevRead1 = 0;
+  prevRead2 = 0;
+  // ---
+
+  //motor control setup
+  // ---
+  md.init();
+  motor1Speed = 300;
+  motor2Speed = 340;
+  // ---
+
+  //fudge factors
+  // ---
+  desiredDistance = desiredFeet * FEETTOMETERS;
+  distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
+  // ---
+
+  //Serial
+  // ---
+  Serial.begin(115200);
+  // ---
+}
+
+//reads encoders and writes to motors (only moves in a straight line for now)
+void loop() {
+  //encoder reading loop code
+  //---  
+  //read the encoders
+  readEncoders();
+  // ---
+
+  //driving the motors
+  // ---
+  driveMotors();
+  // ---
+
+  //stabilizing the velocity
+  // ---
+  stabilizeVelocity();
+  // ---
+
+  //implementing the controller
+  // ---
+  maxVelocityController();  
+  // ---
+
   // printline debugging
   // ---
-  if(turningFlag){
-    Serial.println(int(phi * 10000));
-  }
+  // if(turningFlag){
+  //   Serial.println(int(phi * 10000));
+  // }
   // if(printOnce){
   //   Serial.println(int(distWithFudge * 10000));
   //   exit(0);
