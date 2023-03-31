@@ -33,7 +33,7 @@ int printOnce = 0; //flag for testing the final distance the robot travelled and
 int motorMax = 150; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
 int motorDecayFactor = motorMax * 10;
 
-int turningFlag = true; //flag which indicates that the robot should be turning
+int turnFlag = true; //flag which indicates that the robot should be turning
 int turnLeft = true;
 int forwardFlag = false; //flag which indicates that the robot should be moving forward
 int transitionFlag = false; //flag which indicates what to do next given some
@@ -56,6 +56,9 @@ void setDegrees(int degIn){
   phiAndPhudge = desiredPhi + desiredPhi * degreeFudgeFactor;
   if(phiAndPhudge < 0){
     turnLeft = false;
+  }
+  else{
+    turnLeft = true;
   }
 }
 
@@ -133,7 +136,7 @@ void turn(){
   // if the motor speeds are too slow set them to zero, re
   if((motor1Speed <= 10) || (motor2Speed <= 10)){
     //exit the turning code and go to transition
-    turningFlag = false;
+    turnFlag = false;
     transitionFlag = true; 
   }
   if(abs(phi) < abs(phiAndPhudge)){
@@ -163,23 +166,36 @@ void forward(){
   }
 }
 
-//'instructions' to the robot on whether to turn or move forward
+//setup the robot for the next instruction
 void transition(){
   if(transitionFlag){
-    Serial.println(int(phiAndPhudge * 100));
     clear();
-    turningFlag = false;
-    forwardFlag = true;
-    forwardSettings();
+    instruction();
     transitionFlag = false;
-    delay(200);
+    delay(500);
   }
 }
 
-void instruction();
+void instruction(){
+  turnInstruction(45);
+}
+
+void turnInstruction(int degIn){
+  turnFlag = true;
+  forwardFlag = false;
+  turnSettings();
+  setDegrees(degIn);
+}
+
+void forwardInstruction(int distIn){
+  turnFlag = false;
+  forwardFlag = true;
+  forwardSettings();
+  setDistance(distIn);
+}
 
 void driveMotors(){
-  if(turningFlag){
+  if(turnFlag){
     turn();
   }
   if(forwardFlag){
@@ -192,7 +208,7 @@ void driveMotors(){
 
 void stabilizeVelocity(){
   //takes the difference of the velocity
-  if(turningFlag){
+  if(turnFlag){
     if(turnLeft){
       double velocityDiff = leftVelocity + rightVelocity;
       //can add extra motor speed here just like the forward stabilizer
@@ -253,7 +269,7 @@ void stabilizeVelocity(){
 
 void maxVelocityController(){
   //only implement the controller if the robot is within the distance specified by controllerThreshold
-  if(turningFlag){
+  if(turnFlag){
     if(abs(phi) > abs(phiAndPhudge) - controllerThreshold){
       double error = motorDecayFactor * (abs(phiAndPhudge) - abs(phi)); //calculate the amount of distance left and multiply it by the motorDecayFactor
       motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
@@ -263,7 +279,6 @@ void maxVelocityController(){
     if(x > distWithFudge - controllerThreshold){
       double error = motorDecayFactor * (distWithFudge - x); //calculate the amount of distance left and multiply it by the motorDecayFactor
       motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
-      // Serial.println(motorMax);
     }    
   }
 }
@@ -319,7 +334,7 @@ void loop() {
 
   // printline debugging
   // ---
-  // if(turningFlag){
+  // if(turnFlag){
   //   Serial.println(int(phi * 10000));
   // }
   // if(printOnce){
