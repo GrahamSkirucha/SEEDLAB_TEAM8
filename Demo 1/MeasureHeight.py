@@ -1,11 +1,11 @@
-#Angle Detect
+ #Angle Detect
 
 import numpy as np
 import cv2
 import cv2.aruco as aruco
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import time
+import time, math
 
 
     
@@ -41,13 +41,17 @@ while (True):
         bottom_right[1] = int(bottom_right[1])
         bottom_left[0] = int(bottom_left[0])
         bottom_left[1] = int(bottom_left[1])
-            
-        #Finds the angle to the marker
-        angle = ((top_left[0]+top_right[0])/2-320)*(65/640)
-        angle = -1*angle
+        
+        # Estimate the pose of the marker
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, 0.05, ids, blank)
 
-        frame = cv2.putText(frame,str(angle),(320,160),cv2.FONT_HERSHEY_SIMPLEX,3,(255,0,0),3)
+    # Calculate the height of the marker
+        height = tvecs[0][0][1]  # Height is the y-coordinate of the translation vector
 
+        # Draw the marker and the height on the image
+        #cv2.aruco.drawDetectedMarkers(frame, corners)
+        cv2.putText(frame, height, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        
     if cv2.waitKey(1)&0xFF==ord('q'):
         break
       
