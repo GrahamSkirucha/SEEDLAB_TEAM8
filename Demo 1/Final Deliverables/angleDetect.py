@@ -27,7 +27,6 @@ while (True):
     if ids is None:
         print("No markers found")
 
-    
     else:
         #(29592,1944)
         #Defines corners of marker if present

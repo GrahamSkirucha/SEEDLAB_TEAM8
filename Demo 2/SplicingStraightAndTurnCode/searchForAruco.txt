@@ -1,0 +1,59 @@
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(38400);
+}
+
+bool inView;
+bool DataRead;
+
+// determine distance aruco marker is based on height of marker 
+void search() {
+  if (DataRead) {
+    markerAngle = data.toInt(); //unitless
+    DataRead = false;
+  }
+
+  // arbitrarily should receive 180 when marker is not in view of camera
+  inView = (markerAngle == 180) ? false : true;
+
+  // while marker not in view
+  while (!inView) {
+    // slowly turn until in view
+    //turn 45
+    turningFlag = true;
+    phi = 45;
+    //readEncoders(); ?
+    driveMotors(); // @Jaron does this also need the other functions?
+    //stabilizeVelocity(); ?
+    //maxVelocityController(); ?
+
+    // wait and check for marker
+    delay(1000);
+    // maybe change this to while loop to allow check for 2 seconds?
+    if (DataRead) {
+      markerAngle = data.toInt(); //unitless
+      DataRead = false;
+    }
+    delay(1000);
+    inView = (markerAngle == 180) ? false : true;
+  }
+
+  while (markerAngle != 0) {
+    if (DataRead) {
+      markerAngle = data.toInt(); //unitless
+      DataRead = false;
+    }
+
+    phi = markerAngle;
+    turningFlag = true;
+    driveMotors();
+  }
+}
+
+void serialEvent() {
+  if (Serial.available() > 0) {
+    data = Serial.readStringUntil('\n');
+    DataRead = true;
+  }
+  Serial.flush();
+}
