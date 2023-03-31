@@ -1,6 +1,6 @@
 # Team Progress
 ## Miniproject
-|Tasks to be done|Tasks in progress | Tasks done|
+|Tasks to be done|Tasks in progress|Tasks done|
 |---|---|---|
 |||4.1 - Whole group|
 |||4.2 - Ryan Y|
@@ -15,3 +15,9 @@
 |||1.1 - Detect an aruco marker and determine the robot's angle relative to the marker - Ryan Y|
 |||1.2 - Determine the robot's current angle and position - Jaron O|
 |||1.3 - Move the robot in a straight line for 1 to 10 feet - Ryan S, Graham S, Max W, and Jaron O|
+## Demo 2
+|Tasks to be done|Tasks in progress | Tasks done|
+|---|---|---|
+|||CV|
+|||Refining Movement Code|
+|Integrating Pi code with Arduino code|||
