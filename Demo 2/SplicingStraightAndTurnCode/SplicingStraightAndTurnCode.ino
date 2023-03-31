@@ -23,42 +23,69 @@ double phi = 0.0; //calculated angle from both encoder readings assuming the sta
 #define FEETTOMETERS 0.3048 //conversion factor from feet provided by the user to meters that the robot can measure
 const double CONVERTDEGREESRADIANS = PI / 180.0;
 
-double desiredFeet = 2; //desired distance in feet - will be converted to meters
-double desiredDistance; //desired distance in meters
-double distanceFudgeFactor = 0.1; //fudge factor so that the robot moves the desired distance - scales with distance
-double distWithFudge = 0; //distance the robot will use as a reference to drive to
+double defaultDistance = 2; //desired distance in feet - will be converted to meters
+double distWithFudge; //distance the robot will use as a reference to drive to
+
 int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 1
 int motor2Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 2
 double controllerThreshold = 0.1; //distance away from the destination that the controller will kick in
 int printOnce = 0; //flag for testing the final distance the robot travelled and comparing it to the input distance
 int motorMax = 150; //determines the maximum value the motor1Speed and motor2Speed variables can reach - value the controller uses to decrease the speed of the robot
 int motorDecayFactor = motorMax * 10;
-int turningFlag = true; //starts the code turning
-int degreeInput = 90;
-// int degrees = degreeInput / 2;
-int degrees = degreeInput;
-double desiredPhi = degrees * CONVERTDEGREESRADIANS;
-double phudge = 0.0;
-double phiAndPhudge = desiredPhi + desiredPhi * phudge;
+
+int turningFlag = true; //flag which indicates that the robot should be turning
+int turnLeft = true;
+int forwardFlag = false; //flag which indicates that the robot should be moving forward
+int transitionFlag = false; //flag which indicates what to do next given some
+
+int defaultDegrees = -45;
+double phiAndPhudge;
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
 //PID Global Variables
 // #include <PID_v1.h>
-// PID myPID(&x,&leftPWMOut,&desiredDistance, lkp,lki,lkd,DIRECT);
+// PID myPID(&x,&leftPWMOut,&variableToControl, lkp,lki,lkd,DIRECT);
 
 //Dual MC Motor Shield moves the motors
 #include "DualMC33926MotorShield.h"
 DualMC33926MotorShield md;
 
-//motor will stop if there is a fault - code copied from the demo example
-// void stopIfFault()
-// {
-//   if (md.getFault())
-//   {
-//     Serial.println("fault");
-//     while(1);
-//   }
-// }
+void setDegrees(int degIn){
+  double desiredPhi = degIn * CONVERTDEGREESRADIANS;
+  double degreeFudgeFactor = -0.06;
+  phiAndPhudge = desiredPhi + desiredPhi * degreeFudgeFactor;
+  if(phiAndPhudge < 0){
+    turnLeft = false;
+  }
+}
+
+void turnSettings(){
+  motorMax = 150;
+  motorDecayFactor = motorMax * 10;
+  motor1Speed = 110;
+  motor2Speed = 130;
+}
+
+void forwardSettings(){
+  motorMax = 350;
+  motorDecayFactor = motorMax * 10;
+  motor1Speed = 300;
+  motor2Speed = 340;
+}
+
+void setDistance(int distIn){
+  double desiredDistance = distIn * FEETTOMETERS;
+  double distanceFudgeFactor = 0.1;
+  distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
+}
+
+void clear(){
+  x = 0;
+  y = 0;
+  phi = 0;
+  motor1Speed = 0;
+  motor2Speed = 0;  
+}
 
 void readEncoders(){
   //take readings
@@ -105,42 +132,28 @@ void turn(){
   //sets the speed of both motors using the mc motor shield library
   // if the motor speeds are too slow set them to zero, re
   if((motor1Speed <= 10) || (motor2Speed <= 10)){
+    //exit the turning code and go to transition
     turningFlag = false;
-    phi = 0;
-    x = 0;
-    y = 0;
-    motorMax = 350;
-    motor1Speed = 300;
-    motor2Speed = 340;
-    //pause for effect
-    delay(200);   
+    transitionFlag = true; 
   }
-  if(phi < phiAndPhudge){
-    md.setM1Speed(motor1Speed);
-    md.setM2Speed(-motor2Speed);
+  if(abs(phi) < abs(phiAndPhudge)){
+    if(turnLeft){
+      md.setM1Speed(motor1Speed);
+      md.setM2Speed(-motor2Speed);
+    }
+    else{
+      md.setM1Speed(-motor1Speed);
+      md.setM2Speed(motor2Speed);
+    }
     delay(2);
-  }
-  //stops the robot if it has reached its destination
-  else{
-    md.setM1Speed(0);
-    md.setM2Speed(0);
-    delay(2);
-    // printOnce = 1; //exit code for debugging purposes
-    turningFlag = false;
-    phi = 0;
-    x = 0;
-    y = 0;
-    motorMax = 350;
-    motor1Speed = 300;
-    motor2Speed = 340;
   }
 }
 
 void forward(){
   //sets the speed of both motors using the mc motor shield library
   if((motor1Speed <= 10) || (motor2Speed <= 10)){
-    md.setM1Speed(0);
-    md.setM2Speed(0);
+    forwardFlag = false;
+    transitionFlag = true;
     //exit(0);    
   }
   if(x < distWithFudge){
@@ -148,41 +161,71 @@ void forward(){
     md.setM2Speed(motor2Speed);
     delay(2);
   }
-  //stops the robot if it has reached its destination
-  else{
-    md.setM1Speed(0);
-    md.setM2Speed(0);
-    delay(2);
-    printOnce = 1; //exit code for debugging purposes
+}
+
+//'instructions' to the robot on whether to turn or move forward
+void transition(){
+  if(transitionFlag){
+    Serial.println(int(phiAndPhudge * 100));
+    clear();
+    turningFlag = false;
+    forwardFlag = true;
+    forwardSettings();
+    transitionFlag = false;
+    delay(200);
   }
 }
+
+void instruction();
 
 void driveMotors(){
   if(turningFlag){
     turn();
   }
-  else{
+  if(forwardFlag){
     forward();
+  }
+  if(transitionFlag){
+    transition();
   }
 }
 
 void stabilizeVelocity(){
   //takes the difference of the velocity
   if(turningFlag){
-    double velocityDiff = leftVelocity + rightVelocity;
-    //can add extra motor speed here just like the forward stabilizer
-    if(velocityDiff > 0){
-      motor2Speed += 10;
+    if(turnLeft){
+      double velocityDiff = leftVelocity + rightVelocity;
+      //can add extra motor speed here just like the forward stabilizer
+      if(velocityDiff > 0){
+        motor2Speed += 10;
+      }
+      else if(velocityDiff < 0){
+        motor1Speed += 10;
+      }
+      //not sure how to correct for changes in x and y, but we can fix that if we get there
+      //make sure both motor speed integers are below the max speed
+      while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
+        motor1Speed -= 10;
+        motor2Speed -= 10;
+      } 
     }
-    else if(velocityDiff < 0){
-      motor1Speed += 10;
+    else{
+        double velocityDiff = leftVelocity + rightVelocity;
+      //can add extra motor speed here just like the forward stabilizer
+      if(velocityDiff < 0){
+        motor2Speed += 10;
+      }
+      else if(velocityDiff > 0){
+        motor1Speed += 10;
+      }
+      //not sure how to correct for changes in x and y, but we can fix that if we get there
+      //make sure both motor speed integers are below the max speed
+      while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
+        motor1Speed -= 10;
+        motor2Speed -= 10;
+      } 
     }
-    //not sure how to correct for changes in x and y, but we can fix that if we get there
-    //make sure both motor speed integers are below the max speed
-    while((motor1Speed > motorMax) || (motor2Speed > motorMax)){
-      motor1Speed -= 10;
-      motor2Speed -= 10;
-    } 
+    
   }
   else{
     double velocityDiff = leftVelocity - rightVelocity;
@@ -211,8 +254,8 @@ void stabilizeVelocity(){
 void maxVelocityController(){
   //only implement the controller if the robot is within the distance specified by controllerThreshold
   if(turningFlag){
-    if(phi > phiAndPhudge - controllerThreshold){
-      double error = motorDecayFactor * (phiAndPhudge - phi); //calculate the amount of distance left and multiply it by the motorDecayFactor
+    if(abs(phi) > abs(phiAndPhudge) - controllerThreshold){
+      double error = motorDecayFactor * (abs(phiAndPhudge) - abs(phi)); //calculate the amount of distance left and multiply it by the motorDecayFactor
       motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
     }
   }
@@ -236,14 +279,13 @@ void setup() {
   //motor control setup
   // ---
   md.init();
-  motor1Speed = 300;
-  motor2Speed = 340;
+  turnSettings();
   // ---
 
-  //fudge factors
+  //settings
   // ---
-  desiredDistance = desiredFeet * FEETTOMETERS;
-  distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
+  setDegrees(defaultDegrees);
+  setDistance(defaultDistance);
   // ---
 
   //Serial
