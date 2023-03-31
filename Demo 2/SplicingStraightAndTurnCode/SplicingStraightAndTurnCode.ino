@@ -101,60 +101,68 @@ void readEncoders(){
   }
 }
 
+void turn(){
+  //sets the speed of both motors using the mc motor shield library
+  // if the motor speeds are too slow set them to zero, re
+  if((motor1Speed <= 10) || (motor2Speed <= 10)){
+    turningFlag = false;
+    phi = 0;
+    x = 0;
+    y = 0;
+    motorMax = 350;
+    motor1Speed = 300;
+    motor2Speed = 340;
+    //pause for effect
+    delay(200);   
+  }
+  if(phi < phiAndPhudge){
+    md.setM1Speed(motor1Speed);
+    md.setM2Speed(-motor2Speed);
+    delay(2);
+  }
+  //stops the robot if it has reached its destination
+  else{
+    md.setM1Speed(0);
+    md.setM2Speed(0);
+    delay(2);
+    // printOnce = 1; //exit code for debugging purposes
+    turningFlag = false;
+    phi = 0;
+    x = 0;
+    y = 0;
+    motorMax = 350;
+    motor1Speed = 300;
+    motor2Speed = 340;
+  }
+}
+
+void forward(){
+  //sets the speed of both motors using the mc motor shield library
+  if((motor1Speed <= 10) || (motor2Speed <= 10)){
+    md.setM1Speed(0);
+    md.setM2Speed(0);
+    //exit(0);    
+  }
+  if(x < distWithFudge){
+    md.setM1Speed(motor1Speed);
+    md.setM2Speed(motor2Speed);
+    delay(2);
+  }
+  //stops the robot if it has reached its destination
+  else{
+    md.setM1Speed(0);
+    md.setM2Speed(0);
+    delay(2);
+    printOnce = 1; //exit code for debugging purposes
+  }
+}
+
 void driveMotors(){
   if(turningFlag){
-    //sets the speed of both motors using the mc motor shield library
-    // if the motor speeds are too slow set them to zero, re
-    if((motor1Speed <= 10) || (motor2Speed <= 10)){
-      turningFlag = false;
-      phi = 0;
-      x = 0;
-      y = 0;
-      motorMax = 350;
-      motor1Speed = 300;
-      motor2Speed = 340;
-      //pause for effect
-      delay(200);   
-    }
-    if(phi < phiAndPhudge){
-      md.setM1Speed(motor1Speed);
-      md.setM2Speed(-motor2Speed);
-      delay(2);
-    }
-    //stops the robot if it has reached its destination
-    else{
-      md.setM1Speed(0);
-      md.setM2Speed(0);
-      delay(2);
-      // printOnce = 1; //exit code for debugging purposes
-      turningFlag = false;
-      phi = 0;
-      x = 0;
-      y = 0;
-      motorMax = 350;
-      motor1Speed = 300;
-      motor2Speed = 340;
-    }
+    turn();
   }
   else{
-    //sets the speed of both motors using the mc motor shield library
-    if((motor1Speed <= 10) || (motor2Speed <= 10)){
-      md.setM1Speed(0);
-      md.setM2Speed(0);
-      exit(0);    
-    }
-    if(x < distWithFudge){
-      md.setM1Speed(motor1Speed);
-      md.setM2Speed(motor2Speed);
-      delay(2);
-    }
-    //stops the robot if it has reached its destination
-    else{
-      md.setM1Speed(0);
-      md.setM2Speed(0);
-      delay(2);
-      printOnce = 1; //exit code for debugging purposes
-    }
+    forward();
   }
 }
 
@@ -162,6 +170,7 @@ void stabilizeVelocity(){
   //takes the difference of the velocity
   if(turningFlag){
     double velocityDiff = leftVelocity + rightVelocity;
+    //can add extra motor speed here just like the forward stabilizer
     if(velocityDiff > 0){
       motor2Speed += 10;
     }
