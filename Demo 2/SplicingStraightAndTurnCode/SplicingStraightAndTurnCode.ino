@@ -67,6 +67,23 @@ void setDegrees(float degIn){
   }
 }
 
+void setDistance(float distIn){
+  double desiredDistance = distIn * FEETTOMETERS;
+  double distanceFudgeFactor = 0.1;
+  distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
+}
+
+void clear(){
+  x = 0;
+  y = 0;
+  phi = 0;
+  motor1Speed = 0;
+  motor2Speed = 0;
+  md.setM1Speed(motor1Speed);
+  md.setM2Speed(motor2Speed);
+  delay(2);
+}
+
 void turnSettings(){
   motorMax = 150;
   motorDecayFactor = motorMax * 10;
@@ -89,20 +106,6 @@ void idleSettings(){
   md.setM1Speed(motor1Speed);
   md.setM2Speed(motor2Speed);
   delay(2);
-}
-
-void setDistance(float distIn){
-  double desiredDistance = distIn * FEETTOMETERS;
-  double distanceFudgeFactor = 0.1;
-  distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
-}
-
-void clear(){
-  x = 0;
-  y = 0;
-  phi = 0;
-  motor1Speed = 0;
-  motor2Speed = 0;  
 }
 
 void readEncoders(){
@@ -319,11 +322,14 @@ void serialEvent() {
     String degString = totalString.substring(0,totalString.indexOf(','));
     String distString = totalString.substring(totalString.indexOf(',') + 1);
     degreesFromSerial = degString.toFloat();
-    degreesFromSerial = degreesFromSerial - 135.0;
+    degreesFromSerial = degreesFromSerial;
     distanceFromSerial = distString.toFloat();
     // Serial.println(degString);
     // Serial.println(distString);
     scanFlag = false;
+    turnFlag = false;
+    forwardFlag = false;
+    transitionFlag = true;
     instructionIndex = 0;
   }
   Serial.flush();
