@@ -23,7 +23,7 @@ double phi = 0.0; //calculated angle from both encoder readings assuming the sta
 #define FEETTOMETERS 0.3048 //conversion factor from feet provided by the user to meters that the robot can measure
 const double CONVERTDEGREESRADIANS = PI / 180.0;
 
-double defaultDistance = 2; //desired distance in feet - will be converted to meters
+float defaultDistance = 2.0; //desired distance in feet - will be converted to meters
 double distWithFudge; //distance the robot will use as a reference to drive to
 
 int motor1Speed = 0; //value the mc motor shield library uses to apply a voltage to motor 1
@@ -38,8 +38,13 @@ int turnLeft = true;
 int forwardFlag = false; //flag which indicates that the robot should be moving forward
 int transitionFlag = false; //flag which indicates what to do next given some
 
-int defaultDegrees = -45;
+float defaultDegrees = 45.0;
 double phiAndPhudge;
+
+int scanFlag = true;
+int instructionIndex = 0;
+float degreesFromSerial;
+float distanceFromSerial;
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
 //PID Global Variables
@@ -50,9 +55,9 @@ double phiAndPhudge;
 #include "DualMC33926MotorShield.h"
 DualMC33926MotorShield md;
 
-void setDegrees(int degIn){
+void setDegrees(float degIn){
   double desiredPhi = degIn * CONVERTDEGREESRADIANS;
-  double degreeFudgeFactor = -0.06;
+  double degreeFudgeFactor = 0.05;
   phiAndPhudge = desiredPhi + desiredPhi * degreeFudgeFactor;
   if(phiAndPhudge < 0){
     turnLeft = false;
@@ -76,7 +81,17 @@ void forwardSettings(){
   motor2Speed = 340;
 }
 
-void setDistance(int distIn){
+void idleSettings(){
+  motorMax = 0;
+  motorDecayFactor = motorMax * 10;
+  motor1Speed = 0;
+  motor2Speed = 0;
+  md.setM1Speed(motor1Speed);
+  md.setM2Speed(motor2Speed);
+  delay(2);
+}
+
+void setDistance(float distIn){
   double desiredDistance = distIn * FEETTOMETERS;
   double distanceFudgeFactor = 0.1;
   distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
@@ -172,22 +187,37 @@ void transition(){
     clear();
     instruction();
     transitionFlag = false;
-    delay(500);
+    delay(1000);
   }
 }
 
 void instruction(){
-  turnInstruction(45);
+  if(scanFlag){
+    turnInstruction(45);
+  }
+  else{
+    if(instructionIndex == 0){
+      turnInstruction(degreesFromSerial);
+      instructionIndex ++;
+    }
+    else if(instructionIndex == 1){
+      forwardInstruction(distanceFromSerial);
+      instructionIndex ++;
+    }
+    else{
+      idleSettings();
+    }
+  }
 }
 
-void turnInstruction(int degIn){
+void turnInstruction(float degIn){
   turnFlag = true;
   forwardFlag = false;
   turnSettings();
   setDegrees(degIn);
 }
 
-void forwardInstruction(int distIn){
+void forwardInstruction(float distIn){
   turnFlag = false;
   forwardFlag = true;
   forwardSettings();
@@ -226,7 +256,7 @@ void stabilizeVelocity(){
       } 
     }
     else{
-        double velocityDiff = leftVelocity + rightVelocity;
+      double velocityDiff = leftVelocity + rightVelocity;
       //can add extra motor speed here just like the forward stabilizer
       if(velocityDiff < 0){
         motor2Speed += 10;
@@ -281,6 +311,22 @@ void maxVelocityController(){
       motorMax = int(error); //set the new maximum motor speed - the motor speed will decay quickly from 350 because of the speed of the loop and the responsiveness of the controller
     }    
   }
+}
+
+void serialEvent() {
+  if (Serial.available() > 0) {
+    String totalString = Serial.readStringUntil('\n');
+    String degString = totalString.substring(0,totalString.indexOf(','));
+    String distString = totalString.substring(totalString.indexOf(',') + 1);
+    degreesFromSerial = degString.toFloat();
+    degreesFromSerial = degreesFromSerial - 135.0;
+    distanceFromSerial = distString.toFloat();
+    // Serial.println(degString);
+    // Serial.println(distString);
+    scanFlag = false;
+    instructionIndex = 0;
+  }
+  Serial.flush();
 }
 
 //sets the necessary variables for the encoders, mc motor shield library, fudge factors, and Serial
