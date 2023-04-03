@@ -45,6 +45,9 @@ int scanFlag = true;
 int instructionIndex = 0;
 float degreesFromSerial;
 float distanceFromSerial;
+int scanDelay = 600;
+int targetDelay = 200;
+int currentDelay;
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
 //PID Global Variables
@@ -190,7 +193,7 @@ void transition(){
     clear();
     instruction();
     transitionFlag = false;
-    delay(1000);
+    delay(currentDelay);
   }
 }
 
@@ -331,8 +334,10 @@ void serialEvent() {
     forwardFlag = false;
     transitionFlag = true;
     instructionIndex = 0;
+    currentDelay = targetDelay;
   }
   Serial.flush();
+  //Serial.end() //ends the serial here if we want to stop the arduino from reading any more serial events until it is done
 }
 
 //sets the necessary variables for the encoders, mc motor shield library, fudge factors, and Serial
@@ -353,6 +358,8 @@ void setup() {
   // ---
   setDegrees(defaultDegrees);
   setDistance(defaultDistance);
+  currentDelay = scanDelay;
+  instructionIndex = 0;
   // ---
 
   //Serial
