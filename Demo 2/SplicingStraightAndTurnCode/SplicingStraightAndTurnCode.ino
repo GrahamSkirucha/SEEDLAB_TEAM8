@@ -45,9 +45,11 @@ int scanFlag = true;
 int instructionIndex = 0;
 float degreesFromSerial;
 float distanceFromSerial;
-int scanDelay = 600;
-int targetDelay = 200;
+int scanDelay = 400;
+int targetDelay = 50;
 int currentDelay;
+int numberEvents = 2;
+int currentEvent;
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
 //PID Global Variables
@@ -202,11 +204,11 @@ void instruction(){
     turnInstruction(45);
   }
   else{
-    if(instructionIndex == 0){
+    if(instructionIndex == 1){
       turnInstruction(degreesFromSerial);
       instructionIndex ++;
     }
-    else if(instructionIndex == 1){
+    else if(instructionIndex == 2){
       forwardInstruction(distanceFromSerial);
       instructionIndex ++;
     }
@@ -320,24 +322,27 @@ void maxVelocityController(){
 }
 
 void serialEvent() {
-  if (Serial.available() > 0) {
-    String totalString = Serial.readStringUntil('\n');
-    String degString = totalString.substring(0,totalString.indexOf(','));
-    String distString = totalString.substring(totalString.indexOf(',') + 1);
-    degreesFromSerial = degString.toFloat();
-    degreesFromSerial = degreesFromSerial;
-    distanceFromSerial = distString.toFloat();
-    // Serial.println(degString);
-    // Serial.println(distString);
-    scanFlag = false;
-    turnFlag = false;
-    forwardFlag = false;
-    transitionFlag = true;
-    instructionIndex = 0;
-    currentDelay = targetDelay;
+  if(currentEvent < numberEvents){
+    if (Serial.available() > 0) {
+      String totalString = Serial.readStringUntil('\n');
+      String degString = totalString.substring(0,totalString.indexOf(','));
+      String distString = totalString.substring(totalString.indexOf(',') + 1);
+      degreesFromSerial = degString.toFloat();
+      degreesFromSerial = degreesFromSerial;
+      distanceFromSerial = distString.toFloat();
+      // Serial.println(degString);
+      // Serial.println(distString);
+      scanFlag = false;
+      turnFlag = false;
+      forwardFlag = false;
+      transitionFlag = true;
+      instructionIndex ++;
+      currentDelay = targetDelay;
+      currentEvent ++;
+      Serial.end(); //ends the serial here if we want to stop the arduino from reading any more serial events until it is done
+    }
+    Serial.flush();
   }
-  Serial.flush();
-  //Serial.end() //ends the serial here if we want to stop the arduino from reading any more serial events until it is done
 }
 
 //sets the necessary variables for the encoders, mc motor shield library, fudge factors, and Serial
@@ -360,6 +365,7 @@ void setup() {
   setDistance(defaultDistance);
   currentDelay = scanDelay;
   instructionIndex = 0;
+  currentEvent = 0;
   // ---
 
   //Serial
