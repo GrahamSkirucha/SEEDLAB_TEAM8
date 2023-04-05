@@ -45,8 +45,8 @@ int scanFlag = true;
 int instructionIndex = 0;
 float degreesFromSerial;
 float distanceFromSerial;
-int scanDelay = 400;
-int targetDelay = 50;
+int scanDelay = 450;
+int targetDelay = 200;
 int currentDelay;
 int numberEvents = 2;
 int currentEvent;
@@ -74,7 +74,7 @@ void setDegrees(float degIn){
 
 void setDistance(float distIn){
   double desiredDistance = distIn * FEETTOMETERS;
-  double distanceFudgeFactor = 0.1;
+  double distanceFudgeFactor = 0.112;
   distWithFudge = desiredDistance + desiredDistance * distanceFudgeFactor;
 }
 
