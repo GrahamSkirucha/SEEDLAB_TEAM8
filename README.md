@@ -10,8 +10,8 @@ In addition to each folder, we will have this README.md file as well as a text f
 Our team will use the document 'Progress.md' to catalog tasks as 'to be done', 'in progress', and 'done', and this file will also exist outside the project folders.
 
 ## Roles
-Graham Skirucha - System Integration '\n'
-Ryman Sims - Localization/System Integration '\n'
-Ryan Young - Computer Vision '\n'
-Max Mitchell - Control/Simulation '\n'
-Jaron O'Grady - Localization '\n'
+## Graham Skirucha - System Integration 
+## Ryman Sims - Localization/System Integration
+## Ryan Young - Computer Vision 
+## Max Mitchell - Control/Simulation 
+## Jaron O'Grady - Localization
