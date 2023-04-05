@@ -8,3 +8,10 @@ Our repository will have one folder for every assignment that contains all of th
 In addition to each folder, we will have this README.md file as well as a text file called 'enough git to skin a cat.txt'. This text file describes basic git operations
   and how to execute them on a command line.
 Our team will use the document 'Progress.md' to catalog tasks as 'to be done', 'in progress', and 'done', and this file will also exist outside the project folders.
+
+## Roles
+Graham Skirucha - System Integration
+Ryman Sims - Localization/System Integration
+Ryan Young - Computer Vision
+Max Mitchell - Control/Simulation
+Jaron O'Grady - Localization
