@@ -20,4 +20,4 @@
 |---|---|---|
 |||CV|
 |||Refining Movement Code|
-|Integrating Pi code with Arduino code|||
+|||Integrating Pi code with Arduino code|
