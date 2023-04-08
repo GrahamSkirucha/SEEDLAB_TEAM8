@@ -1,5 +1,5 @@
 /*  Demo 2 Arduino sketch
-    Authors: Jaron O'Grady, Ryan Sims, Graham Skiruka, Maximus Waring, and Ryan Young
+    Authors: Jaron O'Grady, Ryan Sims, Graham Skirucha, Maximus Waring, and Ryan Young
 */
 
 //Encoder.h library used to read encoders
