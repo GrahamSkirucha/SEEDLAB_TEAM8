@@ -61,8 +61,8 @@ float distanceFromSerial; //distance value that the robot needs to turn to face 
 int numberEvents = 2; //constant which determines how many steps the robot needs to take before it stops listening to the serial - used by serialEvent()
 int currentEvent; //counter which counts the number of serial events left to read - used by serialEvent() - set by serialEvent() and setup()
 //additional settings for optimizing speed and cv effectiveness
-#define SCAN_DELAY 450 //amount of delay between instructions while the robot is scanning for the marker - used by setup()
-#define TARGET_DELAY 200 //amount of delay between instructions while the robot is moving toward the target - used by serialEvent()
+#define SCAN_DELAY 400 //amount of delay between instructions while the robot is scanning for the marker - used by setup()
+#define TARGET_DELAY 150 //amount of delay between instructions while the robot is moving toward the target - used by serialEvent()
 int currentDelay; //variable which switches between the scan and target delay values to put the robot in two distinct states - used by transition() - set by serialEvent() and setup()
 
 //I was gonna use this PID controller library to control the robot but I did not find it useful - maybe you guys can pull it out of the ashes to use it something for later
