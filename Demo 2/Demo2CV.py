@@ -50,11 +50,12 @@ while (True):
     
 
     #Checks if markers are detected
-    if ids is None:
-        print("No markers found")
+    #if ids is None:
+        #print("No markers found")
 
     
-    else:
+    #else:
+    if ids is not None:    
         #(29592,1944)
         #Defines corners of marker if present
         corners = np.reshape(corners,(4,2))
@@ -95,7 +96,8 @@ while (True):
         print(send_distance)
         send_total = send_angle + send_distance
         ser.write((send_total).encode())
-        break
+        #break
+        print("End of print")
         angle = 0
         distance = 0
         #ser.write((send_distance).encode())
