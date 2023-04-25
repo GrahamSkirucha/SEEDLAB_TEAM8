@@ -61,7 +61,7 @@ float distanceFromSerial; //distance value that the robot needs to turn to face 
 int numberEvents = 2; //constant which determines how many steps the robot needs to take before it stops listening to the serial - used by serialEvent()
 int currentEvent; //counter which counts the number of serial events left to read - used by serialEvent() - set by serialEvent() and setup()
 //additional settings for optimizing speed and cv effectiveness
-#define SCAN_DELAY 400 //amount of delay between instructions while the robot is scanning for the marker - used by setup()
+#define SCAN_DELAY 700 //amount of delay between instructions while the robot is scanning for the marker - used by setup()
 #define TARGET_DELAY 150 //amount of delay between instructions while the robot is moving toward the target - used by serialEvent()
 int currentDelay; //variable which switches between the scan and target delay values to put the robot in two distinct states - used by transition() - set by serialEvent() and setup()
 
@@ -157,7 +157,7 @@ void serialEvent() {
 */
 void setDegrees(float degIn){
   double desiredPhi = degIn * CONVERTDEGREESRADIANS;
-  double degreeFudgeFactor = 0.05;
+  double degreeFudgeFactor = 0.0;
   phiAndPhudge = desiredPhi + desiredPhi * degreeFudgeFactor;
   if(phiAndPhudge < 0){
     turnLeft = false;
@@ -199,10 +199,10 @@ void clear(){
     - setting motor1Speed and motor2Speed to arbitrary default values below the max - these values will be changed by stabilizeVelocity()
 */
 void turnSettings(){
-  motorMax = 150;
+  motorMax = 300;
   motorDecayFactor = motorMax * 10;
-  motor1Speed = 110;
-  motor2Speed = 130;
+  motor1Speed = 280;
+  motor2Speed = 290;
 }
 
 /*  forwardSettings()
