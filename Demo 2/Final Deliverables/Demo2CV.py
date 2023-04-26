@@ -75,13 +75,16 @@ while (True):
         pixel = abs(((top_left[1] - bottom_left[1])+(top_right[1] - bottom_right[1]))/2)
         
         distance = 161.87*(pixel)**(-1.044)
-        print(pixel)
-        print(distance)
+        #print(pixel)
+        #print("Distance: ", end = "")
+        #print(distance)
+        
         #Finds the angle to the marker
         #58 or 65
         angle = ((top_left[0]+top_right[0])/2-320)*(65/640)
         angle = -1*angle
-        
+        #print("Angle: ", end = "")
+        #print(angle)
         #angleRad = math.pi / 180
         #d = areaRatio / math.cos(abs(angleRad))
         frame = cv2.putText(frame,str(angle),(320,100),cv2.FONT_HERSHEY_SIMPLEX,3,(255,0,0),3)
@@ -96,7 +99,7 @@ while (True):
         print(send_distance)
         send_total = send_angle + send_distance
         ser.write((send_total).encode())
-        #break
+#        break
         print("End of print")
         angle = 0
         distance = 0
