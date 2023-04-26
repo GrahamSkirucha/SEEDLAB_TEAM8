@@ -157,7 +157,7 @@ void serialEvent() {
 */
 void setDegrees(float degIn){
   double desiredPhi = degIn * CONVERTDEGREESRADIANS;
-  double degreeFudgeFactor = 0.12;
+  double degreeFudgeFactor = 0.12; //adjust here for phone settings 
   phiAndPhudge = desiredPhi + desiredPhi * degreeFudgeFactor;
   if(phiAndPhudge < 0){
     turnLeft = false;
